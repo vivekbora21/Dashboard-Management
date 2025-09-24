@@ -1,0 +1,163 @@
+/* ============ Global Reset & Base Styles ============ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #4a90e2 0%, #6db3f2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #333;
+}
+
+span {
+  color: red;
+}
+
+/* ============ Container ============ */
+.app {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+}
+
+.auth-container {
+  background-color: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* ============ Typography ============ */
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* ============ Form Layout ============ */
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 25px;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+input {
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+
+input.error {
+  border-color: #e74c3c;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 70px;
+  position: absolute; /* no overlapping */
+}
+
+/* ============ Divider ============ */
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 25px 0;
+}
+
+/* ============ Buttons ============ */
+.signup-btn, .login-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.signup-btn:hover, .login-btn:hover {
+  background-color: #3a7bc8;
+  transform: translateY(-2px);
+}
+
+.signup-btn:disabled, .login-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============ Links / Switch Auth ============ */
+.switch-auth {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.link,
+.dashboard-link {
+  color: #4a90e2;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.link:hover,
+.dashboard-link:hover {
+  color: #3a7bc8;
+  text-decoration: none;
+}
+
+/* ============ Responsiveness ============ */
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .auth-container {
+    padding: 25px 20px;
+  }
+}
+
+/* ============ Animation ============ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
