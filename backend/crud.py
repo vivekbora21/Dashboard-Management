@@ -1,106 +1,27 @@
-from database import User, Session
+from sqlalchemy.orm import Session
+from . import models, schemas
+from sqlalchemy.exc import IntegrityError
+from passlib.context import CryptContext
 
-class CRUD:
-    User = User  #Reference to the User model
+# Initialize password hashing context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-    def __init__(self):
-        self.Session = Session
+def hash_password(password: str):
+    return pwd_context.hash(password)
 
-    # Add new user
-    def add(self, first_name, last_name, email, mobile, password, created_at):
-        with self.Session() as session:
-            new_user = self.User(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                mobile=mobile,
-                password=password,
-                created_at=created_at
-            )
-            session.add(new_user)
-            session.commit()
-
-    # Update user by id
-    def update(self, id, first_name, last_name, username, email, mobile, password=None, security_question=None, security_answer=None,updated_at=None, updated_by=None):
-        with self.Session() as session:
-            user = session.get(self.User, id)
-            if user:
-                user.first_name = first_name
-                user.last_name = last_name
-                user.username = username
-                user.email = email
-                user.mobile = mobile
-
-                # Only update password if provided
-                if password:
-                    user.password = password  
-
-                # Only update security question/answer if provided
-                if security_question:
-                    user.security_question = security_question
-                if security_answer:
-                    user.security_answer = security_answer
-
-                if updated_at:
-                    user.updated_at = updated_at
-                if updated_by:
-                    user.updated_by = updated_by
-
-                session.commit()
-
-    # Delete user by id
-    def delete(self, id):
-        with self.Session() as session:
-            user = session.get(self.User, id)
-            if user:
-                session.delete(user)
-                session.commit()
-
-    # Show all users
-    def show_all(self):
-        with self.Session() as session:
-            return session.query(self.User).all()
-
-    # Find by email
-    def get_user_by_email(self, email: str):
-        with self.Session() as session:
-            return session.query(self.User).filter(self.User.email == email).first()
-
-    # Find by username (for login)
-    def get_user_by_username(self, username: str):
-        with self.Session() as session:
-            return session.query(self.User).filter(self.User.username == username).first()
-
-    # Find by mobile
-    def get_user_by_mobile(self, mobile: str):
-        with self.Session() as session:
-            return session.query(self.User).filter(self.User.mobile == mobile).first()
-
-    # Find by id
-    def get_user_by_id(self, user_id: int):
-        with self.Session() as session:
-            return session.get(self.User, user_id)
-
-    def update_password(self, user_id: int, new_password: str):
-        with self.Session() as session:
-            user = session.get(self.User, user_id)
-            if user:
-                user.password = new_password
-                session.commit()
-                return True
-            return False
-    
-    def update_otp(self, user_id: int, otp: str, otp_expiry=None):
-        with self.Session() as session:
-            user = session.get(self.User, user_id)
-            if user:
-                user.otp = otp
-                user.otp_expiry = otp_expiry
-                session.commit()
-                return True
-            return False
-
-    def save(self, user):
-        with self.Session() as session:
-            session.merge(user)
-            session.commit()
+def create_user(db: Session, user: schemas.UserCreate):
+    db_user = models.User(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        email=user.email,
+        phone=user.phone,
+        hashed_password=hash_password(user.password)
+    )
+    try:
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except IntegrityError:
+        db.rollback()
+        raise Exception("User already exists!")

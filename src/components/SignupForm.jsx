@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import axios from "axios";
 
 const Signup = ({ onSwitchToLogin }) => {
   const inputRef = useRef(null)
@@ -103,14 +104,18 @@ const Signup = ({ onSwitchToLogin }) => {
     return !Object.values(newErrors).some((error) => error);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // Form is valid, proceed with signup
-      console.log("Signup data:", formData);
+      try {
+      // Sending POST request to FastAPI backend
+      const payload = { ...formData };
+      const response = await axios.post("http://localhost:8000/signup/", payload);
+      console.log(response.data);
       alert("Account created successfully!");
-      // Reset form
+      
+      // Reset the form
       setFormData({
         firstName: "",
         lastName: "",
@@ -121,9 +126,11 @@ const Signup = ({ onSwitchToLogin }) => {
       });
       setErrors({});
       setTouched({});
-    } else {
-      console.log(inputRef.current)
-      inputRef.current.focus()
+      } catch (error) {
+        console.log(error.response?.data);
+        console.error("Error during signup:", error.response?.data?.detail || error.message);
+        alert("Error during signup: " + (error.response?.data?.detail || error.message));
+      }
     }
   };
 

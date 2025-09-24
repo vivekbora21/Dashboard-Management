@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import axios from "axios";
 
 const Login = ({ onSwitchToSignup }) => {
   const [formData, setFormData] = useState({email: '',password: ''})
@@ -63,19 +64,32 @@ const Login = ({ onSwitchToSignup }) => {
     return !Object.values(newErrors).some(error => error)
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
     if (validateForm()) {
-      // Form is valid, proceed with login
-      console.log('Login data:', formData)
-      alert('Login successful!')
-      // Reset form
-      setFormData({email: '',npassword: ''})
-      setErrors({})
-      setTouched({})
-    }
-  }
+      try {
+        // Send POST request to FastAPI login route
+        const response = await axios.post("http://localhost:8000/login/", formData);
+        
+        console.log("Login response:", response.data);
+        alert("Login successful!");
+
+        // Reset form
+        setFormData({ email: "", password: "" });
+        setErrors({});
+        setTouched({});
+
+        // Redirect to dashboard
+        // Example using window.location (simple) or React Router
+        window.location.href = "/dashboard";
+
+          } catch (error) {
+            console.error(error.response?.data);
+            alert(error.response?.data?.detail || "Login failed");
+          }
+        }
+      };
 
   return (
     <div className="auth-container">
