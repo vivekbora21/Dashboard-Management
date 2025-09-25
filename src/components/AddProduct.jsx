@@ -106,16 +106,26 @@ const AddProduct = () => {
           </div>
           <div className="form-group">
             <label htmlFor="productCategory">Product Category *</label>
-            <input
-              type="text"
+            <select
               id="productCategory"
               name="productCategory"
-              placeholder="Enter category"
               value={formData.productCategory}
               onChange={handleChange}
               required
               className="form-input"
-            />
+            >
+              <option value="">Select a category</option>
+              <option value="Laptops">Laptops</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Mobiles">Mobiles</option>
+              <option value="Home Appliances">Home Appliances</option>
+              <option value="Clothings">Clothings</option>
+              <option value="Shoes">Shoes</option>
+              <option value="Books">Books</option>
+              <option value="Home décor">Home décor</option>
+              <option value="Self care">Self care</option>
+            </select>
           </div>
           <div className="form-group">
             <label htmlFor="productPrice">Product Price (In Rupees)*</label>

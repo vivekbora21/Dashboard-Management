@@ -83,6 +83,11 @@ body {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
+.sidebar a {
+  text-decoration: none;
+  color: inherit;
+}
+
 /* ============ MAIN CONTENT ============ */
 .main-content {
   flex: 1;
