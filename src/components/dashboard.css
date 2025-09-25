@@ -102,10 +102,7 @@ body {
   box-shadow: var(--shadow);
 }
 
-.header h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-}
+
 
 .header-icons span {
   margin-left: 20px;

@@ -11,11 +11,10 @@ const SidebarLayout = () => {
         <nav>
           <ul>
             <li><Link to="/dashboard">Dashboard</Link></li>
+            <li><Link to="/dashboard/addproduct">Add Product</Link></li>
             <li><Link to="/dashboard/statistics">Statistic</Link></li>
             <li><Link to="/dashboard/products">Product</Link></li>
-            <li><Link to="/dashboard/report">Report</Link></li>
             <li><Link to="/dashboard/customers">Customer</Link></li>
-            <li><Link to="/dashboard/addproduct">Add Product</Link></li>
             <li><Link to="/dashboard/settings">Settings</Link></li>
           </ul>
         </nav>

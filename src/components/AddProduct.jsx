@@ -66,22 +66,22 @@ const AddProduct = () => {
     <div className="add-product-page">
       <div className="page-header">
         <h1>Products Management</h1>
-        <p>Upload your product CSV or add products manually</p>
+        <p>Upload your product Excel or add products manually</p>
       </div>
 
       {/* Upload Section */}
       <section className="upload-section">
         <div className="section-icon">📁</div>
-        <h3>Upload CSV File</h3>
+        <h3>Upload File</h3>
         <div className="upload-controls">
           <input type="file" accept=".csv" onChange={handleFileChange} className="file-input" />
           <button onClick={handleFileUpload} className="primary-btn">
-            Upload CSV
+            Upload 
           </button>
         </div>
         <p>
-          <a href="/sample.csv" download className="download-link">
-            ⬇ Download Sample CSV
+          <a href="/Sample.xlsx" download className="download-link">
+            ⬇ Download Sample Excel
           </a>
         </p>
       </section>
@@ -118,7 +118,7 @@ const AddProduct = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="productPrice">Product Price *</label>
+            <label htmlFor="productPrice">Product Price (In Rupees)*</label>
             <input
               type="number"
               id="productPrice"
@@ -131,7 +131,7 @@ const AddProduct = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="sellingPrice">Selling Price *</label>
+            <label htmlFor="sellingPrice">Selling Price (In Rupees)*</label>
             <input
               type="number"
               id="sellingPrice"
@@ -188,7 +188,7 @@ const AddProduct = () => {
               type="text"
               id="discounts"
               name="discounts"
-              placeholder="e.g. 10%"
+              placeholder="In rupees"
               value={formData.discounts}
               onChange={handleChange}
               className="form-input"
