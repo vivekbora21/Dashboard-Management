@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
 import models
-import schemas as schemas
+import schemas
 import auth
+import crud
 from database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
@@ -62,3 +64,18 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
         "email": db_user.email,
         "phone": db_user.phone
     }}
+
+# Manual Product Update
+@app.post("/manual-update/", response_model=schemas.ProductOut, status_code=status.HTTP_201_CREATED)
+def manual_update(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    try:
+        new_product = crud.create_product(db, product)
+        return new_product
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+# Get all products
+@app.get("/products/", response_model=List[schemas.ProductOut])
+def get_products(db: Session = Depends(get_db)):
+    return crud.get_products(db)
+

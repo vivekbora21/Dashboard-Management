@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Login = ({ onSwitchToSignup }) => {
   const [formData, setFormData] = useState({email: '',password: ''})
-
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
 
@@ -73,7 +75,7 @@ const Login = ({ onSwitchToSignup }) => {
         const response = await axios.post("http://localhost:8000/login/", formData);
         
         console.log("Login response:", response.data);
-        alert("Login successful!");
+        toast.success("Login successful!");
 
         // Reset form
         setFormData({ email: "", password: "" });
@@ -82,14 +84,14 @@ const Login = ({ onSwitchToSignup }) => {
 
         // Redirect to dashboard
         // Example using window.location (simple) or React Router
-        window.location.href = "/dashboard";
+        navigate("/dashboard");
 
-          } catch (error) {
-            console.error(error.response?.data);
-            alert(error.response?.data?.detail || "Login failed");
-          }
-        }
-      };
+      } catch (error) {
+        console.error(error.response?.data);
+        toast.error(error.response?.data?.detail || "Login failed");
+      }
+    }
+  };
 
   return (
     <div className="auth-container">
@@ -113,13 +115,16 @@ const Login = ({ onSwitchToSignup }) => {
           />
           {errors.password && <span className="error-message">{errors.password}</span>}
         </div>
-        <a href="#">Forgot Password</a>
+        <div style={{ paddingBottom: '20px', fontSize: '14px' }}>
+          <a className="link" href="#">Forgot Password</a>
+        </div>
+
         
         <button type="submit" className="login-btn">Login</button>
       </form>
       
       <div className="switch-auth">
-        <p>Don't have an account? <span className="link" onClick={onSwitchToSignup}>Sign Up</span></p>
+        <p>Don't have an account? <span className="link" onClick={() => navigate("/signup")}>Sign Up</span></p>
       </div>
     </div>
   )

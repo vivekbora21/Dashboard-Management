@@ -1,8 +1,11 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Signup = ({ onSwitchToLogin }) => {
   const inputRef = useRef(null)
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "", lastName: "", email: "", phone: "", password: "", confirmPassword: "",
   });
@@ -113,8 +116,8 @@ const Signup = ({ onSwitchToLogin }) => {
       const payload = { ...formData };
       const response = await axios.post("http://localhost:8000/signup/", payload);
       console.log(response.data);
-      alert("Account created successfully!");
-      
+      toast.success("Account created successfully!");
+
       // Reset the form
       setFormData({
         firstName: "",
@@ -126,10 +129,11 @@ const Signup = ({ onSwitchToLogin }) => {
       });
       setErrors({});
       setTouched({});
+      navigate('/login');
       } catch (error) {
         console.log(error.response?.data);
         console.error("Error during signup:", error.response?.data?.detail || error.message);
-        alert("Error during signup: " + (error.response?.data?.detail || error.message));
+        toast.error("Error during signup: " + (error.response?.data?.detail || error.message));
       }
     }
   };
@@ -200,7 +204,7 @@ const Signup = ({ onSwitchToLogin }) => {
       </form>
 
       <div className="switch-auth">
-        <p>Already have an account?{" "}<span className="link" onClick={onSwitchToLogin}>Login</span></p>
+        <p>Already have an account?{" "}<span className="link" onClick={() => navigate("/Login")}>Login</span></p>
       </div>
     </div>
   );
