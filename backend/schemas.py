@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from datetime import date
 
 class UserCreate(BaseModel):
     firstName: str
@@ -29,9 +30,10 @@ class ProductCreate(BaseModel):
     productPrice: float
     sellingPrice: float
     quantity: int
-    userId: str
+    userId: int
     ratings: Optional[float] = None
     discounts: Optional[str] = None
+    soldDate: Optional[date] = None
 
 class ProductOut(BaseModel):
     id: int
@@ -40,9 +42,10 @@ class ProductOut(BaseModel):
     productPrice: float
     sellingPrice: float
     quantity: int
-    userId: str
+    userId: int
     ratings: Optional[float] = None
     discounts: Optional[str] = None
+    soldDate: Optional[date] = None
 
     class Config:
         from_attributes = True

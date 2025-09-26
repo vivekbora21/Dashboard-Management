@@ -12,6 +12,7 @@ const AddProduct = () => {
     userId: "",
     ratings: "",
     discounts: "",
+    soldDate: "",
   });
 
   const handleFileChange = (e) => {
@@ -40,14 +41,22 @@ const AddProduct = () => {
   const handleManualSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch("http://localhost:8000/manual-update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => res.json())
-      .then(() => toast.success("Manual product added successfully"))
-      .catch((err) => console.error(err));
+    try {
+      const res = await fetch("http://localhost:8000/manual-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) {
+        toast.error("Failed to add product: " + res.statusText);
+        return;
+      }
+      await res.json();
+      toast.success("Manual product added successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error: Failed to add product");
+    }
 
     // reset form
     setFormData({
@@ -59,6 +68,7 @@ const AddProduct = () => {
       userId: "",
       ratings: "",
       discounts: "",
+      soldDate: "",
     });
   };
 
@@ -123,7 +133,7 @@ const AddProduct = () => {
               <option value="Clothings">Clothings</option>
               <option value="Shoes">Shoes</option>
               <option value="Books">Books</option>
-              <option value="Home décor">Home décor</option>
+              <option value="Home decor">Home decor</option>
               <option value="Self care">Self care</option>
             </select>
           </div>
@@ -169,10 +179,10 @@ const AddProduct = () => {
           <div className="form-group">
             <label htmlFor="userId">User ID *</label>
             <input
-              type="text"
+              type="number"
               id="userId"
               name="userId"
-              placeholder="Enter user ID"
+              placeholder="Enter numeric user ID"
               value={formData.userId}
               onChange={handleChange}
               required
@@ -200,6 +210,18 @@ const AddProduct = () => {
               name="discounts"
               placeholder="In rupees"
               value={formData.discounts}
+              onChange={handleChange}
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="soldDate">Sold Date</label>
+            <input
+              type="date"
+              id="soldDate"
+              name="soldDate"
+              placeholder="YYYY-MM-DD"
+              value={formData.soldDate}
               onChange={handleChange}
               className="form-input"
             />

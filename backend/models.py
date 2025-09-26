@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -22,6 +22,7 @@ class Product(Base):
     productPrice = Column(Float)
     sellingPrice = Column(Float)
     quantity = Column(Integer)
-    userId = Column(String(100))
+    userId = Column(Integer, ForeignKey('users.id'))
     ratings = Column(Float, nullable=True)
     discounts = Column(String(50), nullable=True)
+    soldDate = Column(Date, nullable=True)

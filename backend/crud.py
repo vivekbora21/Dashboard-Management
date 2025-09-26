@@ -36,7 +36,8 @@ def create_product(db: Session, product: schemas.ProductCreate):
         quantity=product.quantity,
         userId=product.userId,
         ratings=product.ratings,
-        discounts=product.discounts
+        discounts=product.discounts,
+        soldDate=product.soldDate
     )
     try:
         db.add(db_product)

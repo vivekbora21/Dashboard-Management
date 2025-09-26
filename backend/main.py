@@ -11,7 +11,7 @@ from database import engine, get_db
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
-origins = ["http://localhost:5173","http://127.0.0.1:5173",]
+origins = ["http://localhost:3001","http://127.0.0.1:3001"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

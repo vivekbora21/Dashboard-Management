@@ -7,6 +7,10 @@ import Login from './components/LoginForm';
 import Dashboard from './components/dashboard.jsx';
 import AddProduct from './components/AddProduct.jsx';
 import SidebarLayout from './components/SidebarLayout.jsx';
+import Products from './components/Products.jsx'
+import Settings  from './components/Settings.jsx';
+import Customers from './components/Customers.jsx';
+import Statistics from './components/Statistics.jsx';
 import './components/AppStyle.css'
 
 function App() {
@@ -19,6 +23,10 @@ function App() {
         <Route path="/dashboard" element={<SidebarLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="addproduct" element={<AddProduct />} />
+          <Route path="products" element={<Products />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="statistics" element={<Statistics />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
       <ToastContainer />

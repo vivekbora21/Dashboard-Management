@@ -7,7 +7,6 @@ const Dashboard = () => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
-    // Fetch products from backend API
     axios.get("http://localhost:8000/products/")
       .then(response => {
         setProducts(response.data);
@@ -80,12 +79,12 @@ const Dashboard = () => {
             <tr>
               <th>Product Name</th>
               <th>Product Category</th>
-              <th>Product Price</th>
+              <th>Product Price (₹)</th>
               <th>Quantity</th>
-              <th>Selling Price</th>
-              <th>Discounts</th>
+              <th>Selling Price (₹)</th>
               <th>Ratings</th>
-              <th>Actions</th>
+              <th>Selling Date</th>
+              <th>Total Profits (₹)</th>
             </tr>
           </thead>
           <tbody>
@@ -93,15 +92,12 @@ const Dashboard = () => {
               <tr key={p.id}>
                 <td>{p.productName}</td>
                 <td>{p.productCategory}</td>
-                <td>{p.productPrice}</td>
+                <td>{p.productPrice} ₹</td>
                 <td>{p.quantity}</td>
-                <td>{p.sellingPrice}</td>
-                <td>{p.discounts}</td>
+                <td>{p.sellingPrice} ₹</td>
                 <td>{p.ratings}</td>
-                <td>
-                  <button className="action-btn edit">Edit</button>
-                  <button className="action-btn delete">Delete</button>
-                </td>
+                <td>{p.soldDate}</td>
+                <td>{(p.quantity*p.sellingPrice)-(p.quantity*p.productPrice)-(p.quantity*p.discounts)} ₹</td>
               </tr>
             ))}
           </tbody>
