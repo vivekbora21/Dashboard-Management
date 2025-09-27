@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import './Customers.css';
 
 const Customers = () => {
   const navigate = useNavigate();

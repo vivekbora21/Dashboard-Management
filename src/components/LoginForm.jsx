@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import axios from "axios";
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import './LoginForm.css';
 
 const Login = ({ onSwitchToSignup }) => {
   const [formData, setFormData] = useState({email: '',password: ''})
@@ -68,12 +69,12 @@ const Login = ({ onSwitchToSignup }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       try {
         // Send POST request to FastAPI login route
-        const response = await axios.post("http://localhost:8000/login/", formData);
-        
+        const response = await api.post("/login/", formData);
+
         console.log("Login response:", response.data);
         toast.success("Login successful!");
 
@@ -83,7 +84,6 @@ const Login = ({ onSwitchToSignup }) => {
         setTouched({});
 
         // Redirect to dashboard
-        // Example using window.location (simple) or React Router
         navigate("/dashboard");
 
       } catch (error) {

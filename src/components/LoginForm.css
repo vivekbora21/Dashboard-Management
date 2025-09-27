@@ -1,31 +1,4 @@
-/* ============ Global Reset & Base Styles ============ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  color: #333;
-}
-
-span {
-  color: red;
-}
-
 /* ============ Container ============ */
-.app {
-  width: 100%;
-  max-width: 600px;
-  padding: 20px;
-}
-
 .auth-container {
   background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
   padding: 40px 30px;
@@ -57,14 +30,7 @@ h1 {
 }
 
 /* ============ Form Layout ============ */
-.form-row {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
 .form-group {
-  flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -106,15 +72,8 @@ input.error {
   position: absolute;
 }
 
-/* ============ Divider ============ */
-hr {
-  border: none;
-  border-top: 1px solid #e2e8f0;
-  margin: 25px 0;
-}
-
 /* ============ Buttons ============ */
-.signup-btn, .login-btn {
+.login-btn {
   width: 100%;
   padding: 14px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -128,12 +87,12 @@ hr {
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.signup-btn:hover, .login-btn:hover {
+.login-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
-.signup-btn:disabled, .login-btn:disabled {
+.login-btn:disabled {
   background: #cccccc;
   cursor: not-allowed;
   transform: none;
@@ -148,8 +107,7 @@ hr {
   color: #4a5568;
 }
 
-.link,
-.dashboard-link {
+.link {
   color: #667eea;
   cursor: pointer;
   text-decoration: underline;
@@ -157,22 +115,9 @@ hr {
   transition: color 0.3s ease;
 }
 
-.link:hover,
-.dashboard-link:hover {
+.link:hover {
   color: #764ba2;
   text-decoration: none;
-}
-
-/* ============ Responsiveness ============ */
-@media (max-width: 600px) {
-  .form-row {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .auth-container {
-    padding: 25px 20px;
-  }
 }
 
 /* ============ Animation ============ */

@@ -50,3 +50,52 @@ def create_product(db: Session, product: schemas.ProductCreate):
 
 def get_products(db: Session):
     return db.query(models.Product).all()
+
+def update_product(db: Session, product_id: int, product: schemas.ProductCreate):
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not db_product:
+        return None
+    for key, value in product.dict().items():
+        setattr(db_product, key, value)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+def delete_product(db: Session, product_id: int):
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not db_product:
+        return None
+    db.delete(db_product)
+    db.commit()
+    return True
+
+def get_products_by_date(db: Session, date: str):
+    from datetime import datetime
+    try:
+        query_date = datetime.strptime(date, '%Y-%m-%d').date()
+        return db.query(models.Product).filter(models.Product.soldDate == query_date).all()
+    except ValueError:
+        return []
+
+def get_summary(db: Session, period: str):
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+
+    today = datetime.now().date()
+    if period == 'week':
+        start_date = today - timedelta(days=7)
+    elif period == 'month':
+        start_date = today - timedelta(days=30)
+    else:
+        return []
+
+    results = db.query(
+        models.Product.soldDate,
+        func.sum(models.Product.sellingPrice).label('sales'),
+        func.sum(models.Product.sellingPrice - models.Product.productPrice).label('profit')
+    ).filter(
+        models.Product.soldDate >= start_date,
+        models.Product.soldDate <= today
+    ).group_by(models.Product.soldDate).all()
+
+    return [{'date': str(r.soldDate), 'sales': float(r.sales), 'profit': float(r.profit)} for r in results]

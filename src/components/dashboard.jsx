@@ -1,15 +1,40 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from '../api';
 import './dashboard.css'
 
 const Dashboard = () => {
   const [products, setProducts] = useState([]);
+  const [stats, setStats] = useState({
+    totalSales: 0,
+    totalProfit: 0,
+    avgRating: 0,
+    totalOrders: 0
+  });
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
-    axios.get("http://localhost:8000/products/")
+    api.get("/products/")
       .then(response => {
-        setProducts(response.data);
+        const allProducts = response.data.map(p => {
+          const discount = parseFloat(p.discounts) || 0;
+          const profit = (p.quantity * p.sellingPrice) - (p.quantity * p.productPrice) - (p.quantity * discount);
+          return { ...p, profit };
+        });
+
+        // Calculate stats
+        const totalSales = allProducts.reduce((sum, p) => sum + (p.sellingPrice * p.quantity), 0);
+        const totalProfit = allProducts.reduce((sum, p) => sum + p.profit, 0);
+        const totalRatings = allProducts.reduce((sum, p) => sum + (p.ratings || 0), 0);
+        const avgRating = allProducts.length > 0 ? totalRatings / allProducts.length : 0;
+        const totalOrders = allProducts.length;
+
+        setStats({ totalSales, totalProfit, avgRating, totalOrders });
+
+        // Set top 5 products
+        const topProducts = allProducts
+          .sort((a, b) => b.profit - a.profit)
+          .slice(0, 5);
+        setProducts(topProducts);
       })
       .catch(error => {
         console.error("Error fetching products:", error);
@@ -30,15 +55,6 @@ const Dashboard = () => {
   return (
 
     <div className="content">
-      <header className="header">
-        <h2>Dashboard Overview</h2>
-        <div className="header-icons">
-          <span>🔍</span>
-          <span>🔔</span>
-          <span>👤</span>
-        </div>
-      </header>
-
       {/* Welcome Message */}
       <div className="welcome">
         <h3>Welcome back! Here's your dashboard summary.</h3>
@@ -48,31 +64,31 @@ const Dashboard = () => {
       {/* Stats Panel */}
       <section className="stats">
         <div className="stat-card">
-          <div className="stat-icon">👥</div>
-          <h4>Total Visitors</h4>
-          <p className="stat-value">2,344</p>
-        </div>
-        <div className="stat-card">
           <div className="stat-icon">💰</div>
           <h4>Total Sales</h4>
-          <p className="stat-value">$12,456.90</p>
+          <p className="stat-value">₹{stats.totalSales.toFixed(2)}</p>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">📈</div>
+          <h4>Total Profit</h4>
+          <p className="stat-value">₹{stats.totalProfit.toFixed(2)}</p>
         </div>
         <div className="stat-card">
           <div className="stat-icon">📦</div>
           <h4>Total Orders</h4>
-          <p className="stat-value">156</p>
+          <p className="stat-value">{stats.totalOrders}</p>
         </div>
         <div className="stat-card">
           <div className="stat-icon">⭐</div>
-          <h4>Customer Satisfaction</h4>
-          <p className="stat-value">4.8/5</p>
+          <h4>Average Rating</h4>
+          <p className="stat-value">{stats.avgRating.toFixed(1)}/5</p>
         </div>
       </section>
 
       {/* Products Table */}
       <section className="products">
         <div className="products-header">
-          <h4>Product</h4>
+          <h4>Top 5 Products based on profits</h4>
         </div>
         <table>
           <thead>
@@ -97,7 +113,7 @@ const Dashboard = () => {
                 <td>{p.sellingPrice} ₹</td>
                 <td>{p.ratings}</td>
                 <td>{p.soldDate}</td>
-                <td>{(p.quantity*p.sellingPrice)-(p.quantity*p.productPrice)-(p.quantity*p.discounts)} ₹</td>
+                <td>{p.profit} ₹</td>
               </tr>
             ))}
           </tbody>

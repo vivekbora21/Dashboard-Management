@@ -1,9 +1,22 @@
 import React from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import './dashboard.css';
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import api from '../api';
+import './SidebarLayout.css';
 
 const SidebarLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/logout/');
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate to login even if logout fails
+      navigate('/login');
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -20,6 +33,9 @@ const SidebarLayout = () => {
             <li className={location.pathname === "/dashboard/settings" ? "active" : ""}><Link to="/dashboard/settings">Settings</Link></li>
           </ul>
         </nav>
+        <div className="logout-section">
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
+        </div>
       </aside>
 
       {/* Main content changes depending on route */}

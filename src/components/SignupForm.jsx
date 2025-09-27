@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import './SignupForm.css';
 
 const Signup = ({ onSwitchToLogin }) => {
   const inputRef = useRef(null)
@@ -118,6 +119,9 @@ const Signup = ({ onSwitchToLogin }) => {
       console.log(response.data);
       toast.success("Account created successfully!");
 
+      // Store the access token
+      localStorage.setItem("access_token", response.data.access_token);
+
       // Reset the form
       setFormData({
         firstName: "",
@@ -129,7 +133,7 @@ const Signup = ({ onSwitchToLogin }) => {
       });
       setErrors({});
       setTouched({});
-      navigate('/login');
+      navigate('/dashboard');
       } catch (error) {
         console.log(error.response?.data);
         console.error("Error during signup:", error.response?.data?.detail || error.message);
