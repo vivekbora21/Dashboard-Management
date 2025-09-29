@@ -34,7 +34,6 @@ const Login = ({ onSwitchToSignup }) => {
     const { name, value } = e.target
     setFormData({...formData,[name]: value})
 
-    // Validate field if it's been touched before
     if (touched[name]) {
       const error = validateField(name, value)
       setErrors({...errors,[name]: error})
@@ -44,10 +43,8 @@ const Login = ({ onSwitchToSignup }) => {
   const handleBlur = (e) => {
     const { name, value } = e.target
     
-    // Mark field as touched
     setTouched({...touched,[name]: true})
     
-    // Validate the field
     const error = validateField(name, value)
     setErrors({...errors,[name]: error})
   }
@@ -72,18 +69,15 @@ const Login = ({ onSwitchToSignup }) => {
 
     if (validateForm()) {
       try {
-        // Send POST request to FastAPI login route
         const response = await api.post("/login/", formData);
 
         console.log("Login response:", response.data);
         toast.success("Login successful!");
 
-        // Reset form
         setFormData({ email: "", password: "" });
         setErrors({});
         setTouched({});
 
-        // Redirect to dashboard
         navigate("/dashboard");
 
       } catch (error) {
@@ -94,37 +88,37 @@ const Login = ({ onSwitchToSignup }) => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="login-auth-container">
       <h1>Login</h1>
-      
+
       <form onSubmit={handleSubmit} noValidate>
-        <div className="form-group">
+        <div className="login-form-group">
           <label htmlFor="email">Email <span>*</span></label>
           <input type="email" id="email" name="email" value={formData.email}
-            onChange={handleChange} onBlur={handleBlur} className={errors.email ? 'error' : ''}
+            onChange={handleChange} onBlur={handleBlur} className={errors.email ? 'login-error' : ''}
             required
           />
-          {errors.email && <span className="error-message">{errors.email}</span>}
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="password">Password <span>*</span></label>
-          <input type="password" id="password" name="password" value={formData.password}
-            onChange={handleChange} onBlur={handleBlur} className={errors.password ? 'error' : ''}
-            required
-          />
-          {errors.password && <span className="error-message">{errors.password}</span>}
-        </div>
-        <div style={{ paddingBottom: '20px', fontSize: '14px' }}>
-          <a className="link" href="#">Forgot Password</a>
+          {errors.email && <span className="login-error-message">{errors.email}</span>}
         </div>
 
-        
-        <button type="submit" className="login-btn">Login</button>
+        <div className="login-form-group">
+          <label htmlFor="password">Password <span>*</span></label>
+          <input type="password" id="password" name="password" value={formData.password}
+            onChange={handleChange} onBlur={handleBlur} className={errors.password ? 'login-error' : ''}
+            required
+          />
+          {errors.password && <span className="login-error-message">{errors.password}</span>}
+        </div>
+        <div style={{ paddingBottom: '20px', fontSize: '14px' }}>
+          <a className="login-link" href="#">Forgot Password</a>
+        </div>
+
+
+        <button type="submit" className="login-login-btn">Login</button>
       </form>
-      
-      <div className="switch-auth">
-        <p>Don't have an account? <span className="link" onClick={() => navigate("/signup")}>Sign Up</span></p>
+
+      <div className="login-switch-auth">
+        <p>Don't have an account? <span className="login-link" onClick={() => navigate("/signup")}>Sign Up</span></p>
       </div>
     </div>
   )

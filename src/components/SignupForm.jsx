@@ -143,72 +143,72 @@ const Signup = ({ onSwitchToLogin }) => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="signup-auth-container">
       <h1>Create an Account</h1>
 
       <form onSubmit={handleSubmit} noValidate ref={inputRef}>
-        <div className="form-row">
-          <div className="form-group">
+        <div className="signup-form-row">
+          <div className="signup-form-group">
             <label htmlFor="firstName">First Name<span>*</span></label>
             <input type="text" id="firstName" name="firstName" value={formData.firstName}
-              onChange={handleChange} onBlur={handleBlur} className={errors.firstName ? "error" : ""}
+              onChange={handleChange} onBlur={handleBlur} className={errors.firstName ? "signup-error" : ""}
               required
             />
-            {errors.firstName && (<span className="error-message">{errors.firstName}</span>)}
+            {errors.firstName && (<span className="signup-error-message">{errors.firstName}</span>)}
           </div>
-          <div className="form-group">
+          <div className="signup-form-group">
             <label htmlFor="lastName">Last Name<span>*</span></label>
             <input type="text" id="lastName" name="lastName" value={formData.lastName}
-              onChange={handleChange} onBlur={handleBlur} className={errors.lastName ? "error" : ""}
+              onChange={handleChange} onBlur={handleBlur} className={errors.lastName ? "signup-error" : ""}
               required
             />
-            {errors.lastName && (<span className="error-message">{errors.lastName}</span>)}
+            {errors.lastName && (<span className="signup-error-message">{errors.lastName}</span>)}
           </div>
         </div>
 
-        <div className="form-row">
-          <div className="form-group">
+        <div className="signup-form-row">
+          <div className="signup-form-group">
             <label htmlFor="email">Email<span>*</span></label>
             <input type="email" id="email" name="email" value={formData.email}
-              onChange={handleChange} onBlur={handleBlur} className={errors.email ? "error" : ""}
+              onChange={handleChange} onBlur={handleBlur} className={errors.email ? "signup-error" : ""}
               required
             />
-            {errors.email && (<span className="error-message">{errors.email}</span>)}
+            {errors.email && (<span className="signup-error-message">{errors.email}</span>)}
           </div>
-          <div className="form-group">
+          <div className="signup-form-group">
             <label htmlFor="phone">Phone Number<span>*</span></label>
             <input type="tel" id="phone" name="phone" value={formData.phone}
-              onChange={handleChange} onBlur={handleBlur} className={errors.phone ? "error" : ""}
+              onChange={handleChange} onBlur={handleBlur} className={errors.phone ? "signup-error" : ""}
               required
             />
-            {errors.phone && (<span className="error-message">{errors.phone}</span>)}
+            {errors.phone && (<span className="signup-error-message">{errors.phone}</span>)}
           </div>
         </div>
 
-        <div className="form-row">
-          <div className="form-group">
+        <div className="signup-form-row">
+          <div className="signup-form-group">
             <label htmlFor="password">Password<span>*</span></label>
             <input type="password" id="password" name="password" value={formData.password}
-              onChange={handleChange} onBlur={handleBlur} className={errors.password ? "error" : ""}
+              onChange={handleChange} onBlur={handleBlur} className={errors.password ? "signup-error" : ""}
               required
             />
-            {errors.password && (<span className="error-message">{errors.password}</span>)}
+            {errors.password && (<span className="signup-error-message">{errors.password}</span>)}
           </div>
-          <div className="form-group">
+          <div className="signup-form-group">
             <label htmlFor="confirmPassword">Confirm Password<span>*</span></label>
             <input type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword}
-              onChange={handleChange} onBlur={handleBlur} className={errors.confirmPassword ? "error" : ""}
+              onChange={handleChange} onBlur={handleBlur} className={errors.confirmPassword ? "signup-error" : ""}
               required
             />
-            {errors.confirmPassword && (<span className="error-message">{errors.confirmPassword}</span>)}
+            {errors.confirmPassword && (<span className="signup-error-message">{errors.confirmPassword}</span>)}
           </div>
         </div>
 
-        <button type="submit" className="signup-btn">Sign Up</button>
+        <button type="submit" className="signup-signup-btn">Sign Up</button>
       </form>
 
-      <div className="switch-auth">
-        <p>Already have an account?{" "}<span className="link" onClick={() => navigate("/Login")}>Login</span></p>
+      <div className="signup-switch-auth">
+        <p>Already have an account?{" "}<span className="signup-link" onClick={() => navigate("/Login")}>Login</span></p>
       </div>
     </div>
   );
