@@ -1,44 +1,56 @@
 .products-container {
   padding: 20px;
-  max-width: 1200px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .products-container h1 {
+  width: 80vw;
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
+  color: #fff;
 }
 
 .products-table {
-  width: 100%;
+  width: 100hw;
   border-collapse: collapse;
   margin-bottom: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: #fff;
 }
-
-.products-table th,
-.products-table td {
-  padding: 12px;
-  text-align: left;
+.products-table th{
+  padding: 8px;
+  font-size: 15px;
+  text-align: center;
   border-bottom: 1px solid #ddd;
 }
 
+.products-table td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  font-size: 12px;
+}
+
 .products-table th {
-  background-color: #f4f4f4;
+  background-color: #ffffff;
   font-weight: bold;
-  color: #333;
+  color: #ffffff;
 }
 
 .products-table tbody tr:hover {
   background-color: #f9f9f9;
 }
 
+.products-table td:last-child {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
 .update-btn,
 .delete-btn {
   padding: 6px 12px;
-  margin: 0 5px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -70,7 +82,6 @@
   color: #666;
 }
 
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -139,13 +150,22 @@
   margin-top: 20px;
 }
 
-.submit-btn,
-.cancel-btn {
+.submit-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  margin-top: 20px;
+  height: 40px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .submit-btn {
@@ -166,7 +186,6 @@
   background-color: #5a6268;
 }
 
-/* Pagination Styles */
 .pagination {
   display: flex;
   justify-content: center;

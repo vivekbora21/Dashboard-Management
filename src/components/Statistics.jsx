@@ -5,7 +5,6 @@ import './Statistics.css';
 
 const Statistics = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [period, setPeriod] = useState('week');
   const [products, setProducts] = useState([]);
   const [summary, setSummary] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,7 +26,7 @@ const Statistics = () => {
   const fetchSummary = async () => {
     setLoading(true);
     try {
-      const response = await api.get(`/products/summary?period=${period}`);
+      const response = await api.get(`/products/summary?period=month`);
       setSummary(response.data);
     } catch (error) {
       console.error('Error fetching summary:', error);
@@ -39,7 +38,7 @@ const Statistics = () => {
   useEffect(() => {
     fetchProductsByDate(selectedDate);
     fetchSummary();
-  }, [selectedDate, period]);
+  }, [selectedDate]);
 
   const calculateProfit = (product) => {
     return product.sellingPrice - product.productPrice;
@@ -69,17 +68,6 @@ const Statistics = () => {
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
           />
-        </div>
-        <div className="period-selector-section">
-          <label htmlFor="period-selector">Select Period: </label>
-          <select
-            id="period-selector"
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-          >
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-          </select>
         </div>
       </div>
 
@@ -131,24 +119,7 @@ const Statistics = () => {
             </div>
           )}
 
-          <div className="line-chart-section">
-            <h2>Sales and Profit Over Time (Line Chart)</h2>
-            {summary.length === 0 ? (
-              <p>No data available for the selected period.</p>
-            ) : (
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={summary}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="sales" stroke="#8884d8" name="Sales" />
-                  <Line type="monotone" dataKey="profit" stroke="#82ca9d" name="Profit" />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </div>
+          <></>
         </>
       )}
     </div>

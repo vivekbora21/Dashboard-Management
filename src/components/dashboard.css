@@ -39,7 +39,6 @@
 /* ============ CONTENT WRAPPER ============ */
 .content {
   padding: 40px 40px 40px 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
   flex: 1;
   overflow-y: auto;
   min-height: 100vh;

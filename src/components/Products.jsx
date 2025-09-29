@@ -34,7 +34,8 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const response = await api.get('/products/');
-      setProducts(response.data);
+      const sortedProducts = response.data.sort((a, b) => new Date(b.soldDate) - new Date(a.soldDate));
+      setProducts(sortedProducts);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error('Failed to load products');
@@ -64,7 +65,7 @@ const Products = () => {
       try {
         await api.delete(`/products/${productId}`);
         toast.success('Product deleted successfully');
-        fetchProducts(); // Refresh the list
+        fetchProducts();
       } catch (error) {
         console.error('Error deleting product:', error);
         toast.error('Failed to delete product');
@@ -82,7 +83,7 @@ const Products = () => {
       await api.put(`/products/${editingProduct.id}`, formData);
       toast.success('Product updated successfully');
       setShowModal(false);
-      fetchProducts(); // Refresh the list
+      fetchProducts();
     } catch (error) {
       console.error('Error updating product:', error);
       toast.error('Failed to update product');
@@ -113,7 +114,7 @@ const Products = () => {
       <table className="products-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>SL No</th>
             <th>Product Name</th>
             <th>Category</th>
             <th>Product Price (₹)</th>
@@ -126,23 +127,26 @@ const Products = () => {
           </tr>
         </thead>
         <tbody>
-          {currentProducts.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.productName}</td>
-              <td>{product.productCategory}</td>
-              <td>{product.productPrice} ₹</td>
-              <td>{product.sellingPrice} ₹</td>
-              <td>{product.quantity}</td>
-              <td>{product.ratings}</td>
-              <td>{product.discounts}</td>
-              <td>{product.soldDate}</td>
-              <td>
-                <button className="update-btn" onClick={() => handleUpdate(product)}>Update</button>
-                <button className="delete-btn" onClick={() => handleDelete(product.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
+          {currentProducts.map((product, index) => {
+            const slNo = (currentPage - 1) * itemsPerPage + index + 1;
+            return (
+              <tr key={product.id}>
+                <td>{slNo}</td>
+                <td>{product.productName}</td>
+                <td>{product.productCategory}</td>
+                <td>{product.productPrice} ₹</td>
+                <td>{product.sellingPrice} ₹</td>
+                <td>{product.quantity}</td>
+                <td>{product.ratings}</td>
+                <td>{product.discounts}</td>
+                <td>{product.soldDate}</td>
+                <td>
+                  <button className="update-btn" onClick={() => handleUpdate(product)}>Update</button>
+                  <button className="delete-btn" onClick={() => handleDelete(product.id)}>Delete</button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
@@ -245,7 +249,6 @@ const Products = () => {
                 <label>Ratings</label>
                 <input
                   type="number"
-                  step="0.1"
                   name="ratings"
                   value={formData.ratings}
                   onChange={handleFormChange}

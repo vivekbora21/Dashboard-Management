@@ -63,24 +63,20 @@ def login(user: schemas.UserLogin, response: Response, db: Session = Depends(get
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
-    # Verify password
     if not auth.verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
-    # Create access token
     access_token = auth.create_access_token(data={"sub": db_user.email})
 
-    # Set token as HTTP-only cookie
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # Set to True in production with HTTPS
+        secure=False, 
         samesite="lax",
         max_age=auth.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
-    # Return user info without token
     return {"user": {
         "id": db_user.id,
         "firstName": db_user.firstName,
@@ -141,16 +137,12 @@ def get_products_by_date(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    products = crud.get_products_by_date(db, date)
+    products = crud.get_products_by_date(db, date, current_user.id)
     return products
 
 # Get summary for period
 @app.get("/products/summary")
-def get_summary(
-    period: str,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    summary = crud.get_summary(db, period)
+def get_summary(period: str, urrent_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    summary = crud.get_summary(db, period, get_current_user.id)
     return summary
 

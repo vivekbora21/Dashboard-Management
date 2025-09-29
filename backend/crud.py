@@ -4,7 +4,6 @@ import schemas
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 
-# Initialize password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str):
@@ -69,15 +68,15 @@ def delete_product(db: Session, product_id: int):
     db.commit()
     return True
 
-def get_products_by_date(db: Session, date: str):
+def get_products_by_date(db: Session, date: str, user_id: int):
     from datetime import datetime
     try:
         query_date = datetime.strptime(date, '%Y-%m-%d').date()
-        return db.query(models.Product).filter(models.Product.soldDate == query_date).all()
+        return db.query(models.Product).filter(models.Product.soldDate == query_date, models.Product.userId == user_id).all()
     except ValueError:
         return []
 
-def get_summary(db: Session, period: str):
+def get_summary(db: Session, period: str, user_id: int):
     from datetime import datetime, timedelta
     from sqlalchemy import func
 
@@ -95,7 +94,8 @@ def get_summary(db: Session, period: str):
         func.sum(models.Product.sellingPrice - models.Product.productPrice).label('profit')
     ).filter(
         models.Product.soldDate >= start_date,
-        models.Product.soldDate <= today
+        models.Product.soldDate <= today,
+        models.Product.userId == user_id
     ).group_by(models.Product.soldDate).all()
 
     return [{'date': str(r.soldDate), 'sales': float(r.sales), 'profit': float(r.profit)} for r in results]

@@ -6,7 +6,7 @@ from fastapi import Request
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = "your-secret-key"  # Change this to a secure key
+SECRET_KEY = "your-secret-key" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
