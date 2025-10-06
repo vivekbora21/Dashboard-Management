@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
 import api from '../api.js';
 import './Statistics.css';
 
@@ -54,6 +54,33 @@ const Statistics = () => {
     productPrice: product.productPrice,
     sellingPrice: product.sellingPrice,
     profit: calculateProfit(product),
+  }));
+
+  // Aggregate sales by product category for doughnut chart
+  const categorySalesMap = {};
+  products.forEach(product => {
+    if (product.productCategory) {
+      if (!categorySalesMap[product.productCategory]) {
+        categorySalesMap[product.productCategory] = 0;
+      }
+      categorySalesMap[product.productCategory] += product.sellingPrice;
+    }
+  });
+  const doughnutData = Object.entries(categorySalesMap).map(([key, value]) => ({
+    name: key,
+    value: value,
+  }));
+
+  // Prepare data for line and area charts from summary
+  // summary is expected to be an array of {date, sales, profit}
+  const lineData = summary.map(item => ({
+    date: item.date,
+    sales: item.sales,
+  }));
+
+  const areaData = summary.map(item => ({
+    date: item.date,
+    profit: item.profit,
   }));
 
   return (
@@ -116,6 +143,62 @@ const Statistics = () => {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+
+              <div className="line-chart-section">
+                <h2>Sales Over Time (Line Chart)</h2>
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart data={lineData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="sales" stroke="#8884d8" name="Sales" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="area-chart-section">
+                <h2>Profit Over Time (Area Chart)</h2>
+                <ResponsiveContainer width="100%" height={400}>
+                  <AreaChart data={areaData}>
+                    <defs>
+                      <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="profit" stroke="#82ca9d" fillOpacity={1} fill="url(#colorProfit)" name="Profit" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="doughnut-chart-section">
+                <h2>Sales by Product Category (Doughnut Chart)</h2>
+                <ResponsiveContainer width="100%" height={400}>
+                  <PieChart>
+                    <Pie
+                      dataKey="value"
+                      data={doughnutData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {doughnutData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           )}
 
@@ -127,4 +210,3 @@ const Statistics = () => {
 };
 
 export default Statistics;
-

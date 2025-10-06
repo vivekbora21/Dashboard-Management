@@ -121,7 +121,7 @@ const Products = () => {
             <th>Selling Price (₹)</th>
             <th>Quantity</th>
             <th>Ratings</th>
-            <th>Discounts</th>
+            <th>Discounts (₹)</th>
             <th>Sold Date</th>
             <th>Actions</th>
           </tr>
@@ -134,11 +134,11 @@ const Products = () => {
                 <td>{slNo}</td>
                 <td>{product.productName}</td>
                 <td>{product.productCategory}</td>
-                <td>{product.productPrice} ₹</td>
-                <td>{product.sellingPrice} ₹</td>
+                <td>{product.productPrice.toLocaleString('en-IN')} ₹</td>
+                <td>{product.sellingPrice.toLocaleString('en-IN')} ₹</td>
                 <td>{product.quantity}</td>
                 <td>{product.ratings}</td>
-                <td>{product.discounts}</td>
+                <td>{product.discounts.toLocaleString('en-IN')} ₹</td>
                 <td>{product.soldDate}</td>
                 <td>
                   <button className="update-btn" onClick={() => handleUpdate(product)}>Update</button>

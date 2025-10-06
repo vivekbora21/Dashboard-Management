@@ -3,6 +3,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import Request
+import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -39,3 +40,14 @@ def verify_token(token: str, credentials_exception):
         return email
     except JWTError:
         raise credentials_exception
+
+def get_current_user(request: Request, db):
+    credentials_exception = Exception("Could not validate credentials")
+    token = get_token_from_cookie(request)
+    if not token:
+        raise credentials_exception
+    email = verify_token(token, credentials_exception)
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if user is None:
+        raise credentials_exception
+    return user

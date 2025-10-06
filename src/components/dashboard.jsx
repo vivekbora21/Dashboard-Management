@@ -21,7 +21,6 @@ const Dashboard = () => {
           return { ...p, profit };
         });
 
-        // Calculate stats
         const totalSales = allProducts.reduce((sum, p) => sum + (p.sellingPrice * p.quantity), 0);
         const totalProfit = allProducts.reduce((sum, p) => sum + p.profit, 0);
         const totalRatings = allProducts.reduce((sum, p) => sum + (p.ratings || 0), 0);
@@ -30,7 +29,6 @@ const Dashboard = () => {
 
         setStats({ totalSales, totalProfit, avgRating, totalOrders });
 
-        // Set top 5 products
         const topProducts = allProducts
           .sort((a, b) => b.profit - a.profit)
           .slice(0, 5);
@@ -40,7 +38,6 @@ const Dashboard = () => {
         console.error("Error fetching products:", error);
       });
 
-    // Update current date and time every second
     const interval = setInterval(() => {
       setCurrentDateTime(new Date());
     }, 1000);
@@ -48,35 +45,32 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Format the current date and time
   const formattedDateTime = currentDateTime.toLocaleDateString('en-US', 
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
 
   return (
 
     <div className="content">
-      {/* Welcome Message */}
       <div className="welcome">
-        <h3>Welcome back! Here's your dashboard summary.</h3>
+        <h3>Welcome! Here's your dashboard summary.</h3>
         <p>{formattedDateTime}</p>
       </div>
 
-      {/* Stats Panel */}
       <section className="stats">
         <div className="stat-card">
           <div className="stat-icon">💰</div>
           <h4>Total Sales</h4>
-          <p className="stat-value">₹{stats.totalSales.toFixed(2)}</p>
+          <p className="stat-value">₹{stats.totalSales.toLocaleString('en-IN')}</p>
         </div>
         <div className="stat-card">
           <div className="stat-icon">📈</div>
           <h4>Total Profit</h4>
-          <p className="stat-value">₹{stats.totalProfit.toFixed(2)}</p>
+          <p className="stat-value">₹{stats.totalProfit.toLocaleString('en-IN')}</p>
         </div>
         <div className="stat-card">
           <div className="stat-icon">📦</div>
           <h4>Total Orders</h4>
-          <p className="stat-value">{stats.totalOrders}</p>
+          <p className="stat-value">{stats.totalOrders.toLocaleString('en-IN')}</p>
         </div>
         <div className="stat-card">
           <div className="stat-icon">⭐</div>
@@ -108,12 +102,12 @@ const Dashboard = () => {
               <tr key={p.id}>
                 <td>{p.productName}</td>
                 <td>{p.productCategory}</td>
-                <td>{p.productPrice} ₹</td>
+                <td>{p.productPrice.toLocaleString('en-IN')} ₹</td>
                 <td>{p.quantity}</td>
-                <td>{p.sellingPrice} ₹</td>
+                <td>{p.sellingPrice.toLocaleString('en-IN')} ₹</td>
                 <td>{p.ratings}</td>
                 <td>{p.soldDate}</td>
-                <td>{p.profit} ₹</td>
+                <td>{p.profit.toLocaleString('en-IN')} ₹</td>
               </tr>
             ))}
           </tbody>

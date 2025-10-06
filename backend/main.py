@@ -1,15 +1,19 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Response, Request
+from fastapi import FastAPI, Depends, HTTPException, status, Response, Request, UploadFile, File
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
+import pandas as pd
+from datetime import datetime
 import models
 import schemas
 import auth
+import io
 import crud
 from database import engine, get_db
+from utils import parse_date
 
-models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+models.Base.metadata.create_all(bind=engine)
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
@@ -38,7 +42,6 @@ app.add_middleware(
 # Signup
 @app.post("/signup/", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    # Check if user exists
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -87,9 +90,19 @@ def login(user: schemas.UserLogin, response: Response, db: Session = Depends(get
 
 # Manual Product Update
 @app.post("/manual-update/", response_model=schemas.ProductOut, status_code=status.HTTP_201_CREATED)
-def manual_update(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+def manual_update(product: schemas.ProductCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        new_product = crud.create_product(db, product)
+        product_dict = product.dict()
+        product_dict['userId'] = current_user.id
+
+        if product_dict.get('soldDate'):
+            try:
+                product_dict['soldDate'] = parse_date(str(product_dict['soldDate']))
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=f"Invalid date format for soldDate: {e}")
+
+        product_with_user = schemas.ProductCreate(**product_dict)
+        new_product = crud.create_product(db, product_with_user)
         return new_product
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -97,7 +110,7 @@ def manual_update(product: schemas.ProductCreate, db: Session = Depends(get_db))
 # Get all products
 @app.get("/products/", response_model=List[schemas.ProductOut])
 def get_products(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return crud.get_products(db)
+    return crud.get_products(db, current_user.id)
 
 # Update product
 @app.put("/products/{product_id}", response_model=schemas.ProductOut)
@@ -107,7 +120,7 @@ def update_product(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    updated_product = crud.update_product(db, product_id, product)
+    updated_product = crud.update_product(db, product_id, product, current_user.id)
     if not updated_product:
         raise HTTPException(status_code=404, detail="Product not found")
     return updated_product
@@ -119,7 +132,7 @@ def delete_product(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    success = crud.delete_product(db, product_id)
+    success = crud.delete_product(db, product_id, current_user.id)
     if not success:
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Product deleted successfully"}
@@ -142,7 +155,51 @@ def get_products_by_date(
 
 # Get summary for period
 @app.get("/products/summary")
-def get_summary(period: str, urrent_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    summary = crud.get_summary(db, period, get_current_user.id)
+def get_summary(period: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # period can be 'week', 'month' or 'YYYY-MM' for specific month
+    summary = crud.get_summary(db, period, current_user.id)
     return summary
 
+MAX_ROWS = 10
+
+@app.post("/upload-excel/")
+def upload_excel(
+    file: UploadFile = File(...),
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not file.filename.endswith((".xlsx", ".xls")):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only Excel files are allowed.")
+
+    try:
+        df = pd.read_excel(io.BytesIO(file.file.read()))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading Excel file: {str(e)}")
+
+    df = df.head(MAX_ROWS)
+    inserted_products = []
+    for index, row in df.iterrows():
+        try:
+            product_data = models.Product(
+                productName=row.get("productName"),
+                productCategory=row.get("productCategory"),
+                productPrice=float(row.get("productPrice")),
+                sellingPrice=float(row.get("sellingPrice")),
+                quantity=int(row.get("quantity")),
+                userId=current_user.id,
+                ratings=float(row.get("ratings")) if not pd.isna(row.get("ratings")) else None,
+                discounts=row.get("discounts") if not pd.isna(row.get("discounts")) else None,
+                soldDate=parse_date(str(row.get("soldDate"))) if not pd.isna(row.get("soldDate")) else None
+            )
+            db.add(product_data)
+            db.commit()
+            db.refresh(product_data)
+            inserted_products.append(product_data)
+        except Exception as e:
+            db.rollback()
+            continue
+
+    return {
+        "message": f"{len(inserted_products)} products inserted successfully",
+        "products": [p.productName for p in inserted_products]
+    }

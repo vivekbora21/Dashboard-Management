@@ -11,6 +11,7 @@ import Products from './components/Products.jsx'
 import Settings  from './components/Settings.jsx';
 import Customers from './components/Customers.jsx';
 import Statistics from './components/Statistics.jsx';
+import NotFound from './components/NotFound.jsx';
 import './components/AppStyle.css'
 
 function App() {
@@ -20,13 +21,15 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="*" element={<NotFound />} />  
         <Route path="/dashboard" element={<SidebarLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="addproduct" element={<AddProduct />} />
           <Route path="products" element={<Products />} />
           <Route path="customers" element={<Customers />} />
           <Route path="statistics" element={<Statistics />} />
-          <Route path="settings" element={<Settings />} />
+          <Route path="settings" element={<Settings />} />  
+          <Route path="*" element={<NotFound />} />  
         </Route>
       </Routes>
       <ToastContainer />

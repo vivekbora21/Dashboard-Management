@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import api from "../api.js";
 import "./AddProduct.css";
 
 const AddProduct = () => {
@@ -8,6 +9,7 @@ const AddProduct = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showManualForm, setShowManualForm] = useState(false);
   const [showUploadControls, setShowUploadControls] = useState(false);
+  const [uploadedProducts, setUploadedProducts] = useState([]);
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -15,7 +17,6 @@ const AddProduct = () => {
     productPrice: "",
     sellingPrice: "",
     quantity: "",
-    userId: "",
     ratings: "",
     discounts: "",
     soldDate: "",
@@ -27,16 +28,25 @@ const AddProduct = () => {
 
   const handleFileUpload = async () => {
     if (!selectedFile) return toast.error("Please select a file first");
+
     const fd = new FormData();
     fd.append("file", selectedFile);
 
-    await fetch("http://localhost:8000/upload-csv", {
-      method: "POST",
-      body: fd,
-    })
-      .then((res) => res.json())
-      .then(() => toast.success("CSV uploaded successfully"))
-      .catch((err) => console.error(err));
+    try {
+      const res = await api.post("/upload-excel/", fd);
+      const data = res.data;
+
+      toast.success(`${data.products.length} products uploaded successfully`);
+      setUploadedProducts(data.products);
+      setSelectedFile(null);
+    } catch (err) {
+      console.error(err);
+      if (err.response && err.response.data && err.response.data.detail) {
+        toast.error("Upload failed: " + err.response.data.detail);
+      } else {
+        toast.error("Network error: Failed to upload");
+      }
+    }
   };
 
   const handleChange = (e) => {
@@ -45,31 +55,50 @@ const AddProduct = () => {
 
   const handleManualSubmit = async (e) => {
     e.preventDefault();
+
+    // Prepare data with correct types
+    const dataToSend = {
+      productName: formData.productName,
+      productCategory: formData.productCategory,
+      productPrice: parseFloat(formData.productPrice),
+      sellingPrice: parseFloat(formData.sellingPrice),
+      quantity: parseInt(formData.quantity, 10),
+      userId: 0, // userId will be set by backend from token/session
+    };
+
+    // Optional fields: only add if valid
+    if (formData.ratings !== "" && !isNaN(parseFloat(formData.ratings))) {
+      dataToSend.ratings = parseFloat(formData.ratings);
+    }
+    if (formData.discounts !== "") {
+      dataToSend.discounts = formData.discounts;
+    }
+    if (formData.soldDate !== "") {
+      dataToSend.soldDate = formData.soldDate;
+    }
+
     try {
-      const res = await fetch("http://localhost:8000/manual-update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) {
-        toast.error("Failed to add product: " + res.statusText);
-        return;
-      }
-      await res.json();
+      const res = await api.post("/manual-update/", dataToSend);
+
       toast.success("Manual product added successfully");
-      navigate('/dashboard/products');
+
+      setUploadedProducts((prev) => [...prev, res.data.productName]);
+
+      navigate("/dashboard/products");
     } catch (err) {
       console.error(err);
-      toast.error("Network error: Failed to add product");
+      if (err.response && err.response.data && err.response.data.detail) {
+        toast.error("Failed to add product: " + err.response.data.detail);
+      } else {
+        toast.error("Network error: Failed to add product");
+      }
     }
-    // reset form
     setFormData({
       productName: "",
       productCategory: "",
       productPrice: "",
       sellingPrice: "",
       quantity: "",
-      userId: "",
       ratings: "",
       discounts: "",
       soldDate: "",
@@ -83,7 +112,6 @@ const AddProduct = () => {
         <p>Upload your product Excel or add products manually</p>
       </div>
 
-      {/* Selection Cards */}
       <div className="selection-cards">
         <div
           className="card-option"
@@ -105,7 +133,6 @@ const AddProduct = () => {
         </div>
       </div>
 
-      {/* Upload Section (conditionally shown) */}
       {showUploadControls && (
         <section className="upload-section">
           <div className="section-icon">📁</div>
@@ -113,7 +140,7 @@ const AddProduct = () => {
           <div className="upload-controls">
             <input
               type="file"
-              accept=".csv"
+              accept=".xlsx, .xls"
               onChange={handleFileChange}
               className="file-input"
             />
@@ -126,10 +153,18 @@ const AddProduct = () => {
               ⬇ Download Sample Excel
             </a>
           </p>
+          {uploadedProducts.length > 0 && (
+            <div className="uploaded-products">
+              <h4>Uploaded Products:</h4>
+              <ul>
+                {uploadedProducts.map((p, index) => (
+                  <li key={index}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
       )}
-
-      {/* Manual Form (conditionally shown) */}
       {showManualForm && (
         <section className="manual-section">
           <div className="section-icon">✏️</div>
@@ -141,7 +176,6 @@ const AddProduct = () => {
                 type="text"
                 id="productName"
                 name="productName"
-                placeholder="Enter product name"
                 value={formData.productName}
                 onChange={handleChange}
                 required
@@ -172,12 +206,11 @@ const AddProduct = () => {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="productPrice">Product Price (In Rupees)*</label>
+              <label htmlFor="productPrice">Product Price (₹)*</label>
               <input
                 type="number"
                 id="productPrice"
                 name="productPrice"
-                placeholder="0.00"
                 value={formData.productPrice}
                 onChange={handleChange}
                 required
@@ -185,12 +218,11 @@ const AddProduct = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="sellingPrice">Selling Price (In Rupees)*</label>
+              <label htmlFor="sellingPrice">Selling Price (₹)*</label>
               <input
                 type="number"
                 id="sellingPrice"
                 name="sellingPrice"
-                placeholder="0.00"
                 value={formData.sellingPrice}
                 onChange={handleChange}
                 required
@@ -203,7 +235,6 @@ const AddProduct = () => {
                 type="number"
                 id="quantity"
                 name="quantity"
-                placeholder="0"
                 value={formData.quantity}
                 onChange={handleChange}
                 required
@@ -211,38 +242,23 @@ const AddProduct = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="userId">User ID *</label>
-              <input
-                type="number"
-                id="userId"
-                name="userId"
-                placeholder="Enter numeric user ID"
-                value={formData.userId}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="ratings">Ratings</label>
+              <label htmlFor="ratings">Ratings (out of 5)</label>
               <input
                 type="number"
                 step="0.1"
                 id="ratings"
                 name="ratings"
-                placeholder="0.0"
                 value={formData.ratings}
                 onChange={handleChange}
                 className="form-input"
               />
             </div>
             <div className="form-group">
-              <label htmlFor="discounts">Discounts</label>
+              <label htmlFor="discounts">Discounts (₹)</label>
               <input
                 type="text"
                 id="discounts"
                 name="discounts"
-                placeholder="In rupees"
                 value={formData.discounts}
                 onChange={handleChange}
                 className="form-input"
@@ -254,7 +270,6 @@ const AddProduct = () => {
                 type="date"
                 id="soldDate"
                 name="soldDate"
-                placeholder="YYYY-MM-DD"
                 value={formData.soldDate}
                 onChange={handleChange}
                 className="form-input"

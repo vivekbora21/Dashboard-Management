@@ -49,18 +49,17 @@
   margin-bottom: 40px;
   text-align: center;
   animation: fadeInUp 0.8s ease-out;
+  color: rgb(255, 255, 255);
 }
 
 .welcome h3 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #2d3748;
   margin-bottom: 10px;
 }
 
 .welcome p {
   font-size: 1.1rem;
-  color: #4a5568;
   font-weight: 600;
 }
 
@@ -120,8 +119,8 @@
 }
 
 .stat-value {
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: #2d3748;
   background: linear-gradient(135deg, #667eea, #764ba2);
   -webkit-background-clip: text;
