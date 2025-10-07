@@ -163,6 +163,19 @@ def logout(response: Response):
     response.delete_cookie(key="access_token")
     return {"message": "Logged out successfully"}
 
+# Get user profile
+@app.get("/user/profile", response_model=schemas.UserOut)
+def get_user_profile(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
+# Update user profile
+@app.put("/user/profile", response_model=schemas.UserOut)
+def update_user_profile(user: schemas.UserUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    updated_user = crud.update_user(db, current_user.id, user)
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return updated_user
+
 # Get products by date
 @app.get("/products/date/{date}", response_model=List[schemas.ProductOut])
 def get_products_by_date(

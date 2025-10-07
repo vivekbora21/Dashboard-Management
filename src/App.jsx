@@ -4,7 +4,6 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './components/AppStyle.css';
 
-// Lazy load components
 const Signup = lazy(() => import('./components/Signup/SignupForm'));
 const Login = lazy(() => import('./components/Login/LoginForm'));
 const Dashboard = lazy(() => import('./components/Dashboard/dashboard.jsx'));
@@ -28,7 +27,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="addproduct" element={<AddProduct />} />
             <Route path="products" element={<Products />} />
-            <Route path="customers" element={<Customers />} />
+            <Route path="profile" element={<Customers />} />
             <Route path="statistics" element={<Statistics />} />
           </Route>
         </Routes>

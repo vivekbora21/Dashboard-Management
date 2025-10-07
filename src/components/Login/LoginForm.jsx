@@ -34,10 +34,8 @@ const Login = ({ onSwitchToSignup }) => {
     const { name, value } = e.target
     setFormData({...formData,[name]: value})
 
-    if (touched[name]) {
-      const error = validateField(name, value)
-      setErrors({...errors,[name]: error})
-    }
+    const error = validateField(name, value)
+    setErrors({...errors,[name]: error})
   }
 
   const handleBlur = (e) => {
@@ -114,7 +112,7 @@ const Login = ({ onSwitchToSignup }) => {
         </div>
 
 
-        <button type="submit" className="login-login-btn">Login</button>
+        <button type="submit" className="login-login-btn" disabled={Object.values(errors).some(error => error)}>Login</button>
       </form>
 
       <div className="login-switch-auth">

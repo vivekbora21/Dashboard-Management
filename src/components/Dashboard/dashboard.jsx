@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import api from '../../api';
 import './dashboard.css';
+import StatCard from "../StatCard.jsx";
 
 const Dashboard = () => {
   const [products, setProducts] = useState([]);
@@ -76,6 +77,17 @@ const Dashboard = () => {
   const formattedDateTime = currentDateTime.toLocaleDateString('en-US', 
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
 
+  const statItems = [
+    { icon: "💰", title: "Total Sales", value: `₹ ${stats.totalSales.toLocaleString('en-IN')}` },
+    { icon: "📈", title: "Total Profit", value: `₹ ${stats.totalProfit.toLocaleString('en-IN')}` },
+    { icon: "📦", title: "Total Orders", value: stats.totalOrders.toLocaleString('en-IN') },
+    { icon: "⭐", title: "Average Rating", value: `${stats.avgRating.toFixed(1)}/5` },
+    { icon: "🛒", title: "Total Quantity Sold", value: stats.totalQuantity.toLocaleString('en-IN') },
+    { icon: "🏆", title: "Top Profit Product", value: stats.highestProfitProduct?.productName || "N/A" },
+    { icon: "🔥", title: "Top Selling Product", value: stats.highestSellingProduct?.productName || "N/A" },
+    { icon: "💸", title: "Avg Discount Given", value: `₹ ${stats.avgDiscount.toLocaleString('en-IN')}` },
+  ];
+
   return (
     <div className="dashboard-page">
       <div className="page-header">
@@ -84,53 +96,9 @@ const Dashboard = () => {
       </div>
 
       <section className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">💰</div>
-          <h4>Total Sales</h4>
-          <p className="stat-value">₹ {stats.totalSales.toLocaleString('en-IN')}</p>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">📈</div>
-          <h4>Total Profit</h4>
-          <p className="stat-value">₹ {stats.totalProfit.toLocaleString('en-IN')}</p>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">📦</div>
-          <h4>Total Orders</h4>
-          <p className="stat-value">{stats.totalOrders.toLocaleString('en-IN')}</p>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">⭐</div>
-          <h4>Average Rating</h4>
-          <p className="stat-value">{stats.avgRating.toFixed(1)}/5</p>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">🛒</div>
-          <h4>Total Quantity Sold</h4>
-          <p className="stat-value">{stats.totalQuantity.toLocaleString('en-IN')}</p>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">🏆</div>
-          <h4>Top Profit Product</h4>
-          <p className="stat-value">{stats.highestProfitProduct?.productName}</p>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">🔥</div>
-          <h4>Top Selling Product</h4>
-          <p className="stat-value">{stats.highestSellingProduct?.productName}</p>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">💸</div>
-          <h4>Avg Discount Given</h4>
-          <p className="stat-value">₹ {stats.avgDiscount.toLocaleString('en-IN')}</p>
-        </div>
+        {statItems.map((item, index) => (
+          <StatCard key={index} icon={item.icon} title={item.title} value={item.value} />
+        ))}
       </section>
 
       <section className="products-table">

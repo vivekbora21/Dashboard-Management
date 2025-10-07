@@ -4,6 +4,7 @@ import api from '../../api';
 import './Products.css';
 import { AiFillDelete } from 'react-icons/ai';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
+import { FaList } from 'react-icons/fa';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -112,7 +113,7 @@ const Products = () => {
 
   return (
     <div className="products-container">
-      <h1>Products Management</h1>
+      <h1><FaList/>  Products Management</h1>
       <table className="products-table">
         <thead>
           <tr>

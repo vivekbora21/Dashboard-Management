@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import api from "../../api.js";
 import "./AddProduct.css";
+import { MdDriveFolderUpload } from 'react-icons/md';
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -22,6 +23,50 @@ const AddProduct = () => {
     soldDate: "",
   });
 
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "productName":
+        if (!value.trim()) error = "Product name is required";
+        break;
+
+      case "productCategory":
+        if (!value.trim()) error = "Product category is required";
+        break;
+
+      case "productPrice":
+        const price = parseFloat(value);
+        if (isNaN(price) || price <= 0) error = "Product price must be greater than 0";
+        break;
+
+      case "sellingPrice":
+        const sellPrice = parseFloat(value);
+        if (isNaN(sellPrice) || sellPrice <= 0) error = "Selling price must be greater than 0";
+        break;
+
+      case "quantity":
+        const qty = parseInt(value, 10);
+        if (isNaN(qty) || qty <= 0) error = "Quantity must be greater than 0";
+        break;
+
+      case "ratings":
+        if (value !== "") {
+          const rating = parseFloat(value);
+          if (isNaN(rating) || rating < 0 || rating > 5) error = "Ratings must be between 0 and 5";
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return error;
+  };
+
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
@@ -39,6 +84,7 @@ const AddProduct = () => {
       toast.success(`${data.products.length} products uploaded successfully`);
       setUploadedProducts(data.products);
       setSelectedFile(null);
+      navigate("/dashboard/products");
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data && err.response.data.detail) {
@@ -50,7 +96,17 @@ const AddProduct = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    const error = validateField(name, value);
+    setErrors({ ...errors, [name]: error });
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched({ ...touched, [name]: true });
+    const error = validateField(name, value);
+    setErrors({ ...errors, [name]: error });
   };
 
   const handleManualSubmit = async (e) => {
@@ -103,7 +159,7 @@ const AddProduct = () => {
   return (
     <div className="add-product-page">
       <div className="page-header">
-        <h1>Products Management</h1>
+        <h1> Products Management <MdDriveFolderUpload/></h1>
         <p>Upload your product Excel or add products manually</p>
       </div>
 
@@ -169,11 +225,12 @@ const AddProduct = () => {
           <form onSubmit={handleManualSubmit} className="product-form">
             <div className="form-group">
               <label htmlFor="productName">Product Name *</label>
-              <input type="text" id="productName" name="productName" value={formData.productName}onChange={handleChange} required className="form-input"/>
+              <input type="text" id="productName" name="productName" value={formData.productName} onChange={handleChange} onBlur={handleBlur} required className={`form-input ${errors.productName ? 'error' : ''}`}/>
+              {errors.productName && <span className="error-message">{errors.productName}</span>}
             </div>
             <div className="form-group">
               <label htmlFor="productCategory">Product Category *</label>
-              <select id="productCategory" name="productCategory" value={formData.productCategory} onChange={handleChange} required className="form-input">
+              <select id="productCategory" name="productCategory" value={formData.productCategory} onChange={handleChange} onBlur={handleBlur} required className={`form-input ${errors.productCategory ? 'error' : ''}`}>
                 <option value="">Select a category</option>
                 <option value="Laptops">Laptops</option>
                 <option value="Electronics">Electronics</option>
@@ -186,22 +243,27 @@ const AddProduct = () => {
                 <option value="Home decor">Home decor</option>
                 <option value="Self care">Self care</option>
               </select>
+              {errors.productCategory && <span className="error-message">{errors.productCategory}</span>}
             </div>
             <div className="form-group">
               <label htmlFor="productPrice">Product Price (₹)*</label>
-              <input type="number" id="productPrice" name="productPrice" value={formData.productPrice} onChange={handleChange} required className="form-input"/>
+              <input type="number" id="productPrice" name="productPrice" value={formData.productPrice} onChange={handleChange} onBlur={handleBlur} required className={`form-input ${errors.productPrice ? 'error' : ''}`}/>
+              {errors.productPrice && <span className="error-message">{errors.productPrice}</span>}
             </div>
             <div className="form-group">
               <label htmlFor="sellingPrice">Selling Price (₹)*</label>
-              <input type="number" id="sellingPrice" name="sellingPrice" value={formData.sellingPrice} onChange={handleChange} required className="form-input"/>
+              <input type="number" id="sellingPrice" name="sellingPrice" value={formData.sellingPrice} onChange={handleChange} onBlur={handleBlur} required className={`form-input ${errors.sellingPrice ? 'error' : ''}`}/>
+              {errors.sellingPrice && <span className="error-message">{errors.sellingPrice}</span>}
             </div>
             <div className="form-group">
               <label htmlFor="quantity">Quantity *</label>
-              <input type="number" id="quantity" name="quantity" value={formData.quantity} onChange={handleChange} required className="form-input"/>
+              <input type="number" id="quantity" name="quantity" value={formData.quantity} onChange={handleChange} onBlur={handleBlur} required className={`form-input ${errors.quantity ? 'error' : ''}`}/>
+              {errors.quantity && <span className="error-message">{errors.quantity}</span>}
             </div>
             <div className="form-group">
               <label htmlFor="ratings">Ratings (out of 5)</label>
-              <input type="number" step="0.1" id="ratings" name="ratings" value={formData.ratings} onChange={handleChange} className="form-input"/>
+              <input type="number" step="0.1" id="ratings" name="ratings" value={formData.ratings} onChange={handleChange} onBlur={handleBlur} className={`form-input ${errors.ratings ? 'error' : ''}`}/>
+              {errors.ratings && <span className="error-message">{errors.ratings}</span>}
             </div>
             <div className="form-group">
               <label htmlFor="discounts">Discounts (₹)</label>
@@ -211,7 +273,7 @@ const AddProduct = () => {
               <label htmlFor="soldDate">Sold Date</label>
               <input type="date" id="soldDate" name="soldDate" value={formData.soldDate} onChange={handleChange} className="form-input" />
             </div>
-            <button type="submit" className="submit-btn">Save Product</button>
+            <button type="submit" className="submit-btn" disabled={Object.values(errors).some(error => error)}>Save Product</button>
           </form>
         </section>
       )}

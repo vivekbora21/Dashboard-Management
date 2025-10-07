@@ -186,6 +186,16 @@ def get_stats(db: Session, user_id: int):
         "avgDiscount": avg_discount
     }
 
+def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        return None
+    for key, value in user.dict().items():
+        setattr(db_user, key, value)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
 def get_products_paginated(db: Session, user_id: int, page: int = 1, limit: int = 10):
     offset = (page - 1) * limit
     products = db.query(models.Product).filter(models.Product.userId == user_id).order_by(models.Product.soldDate.desc()).offset(offset).limit(limit).all()

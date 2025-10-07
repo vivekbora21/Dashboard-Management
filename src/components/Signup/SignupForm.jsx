@@ -73,11 +73,19 @@ const Signup = ({ onSwitchToLogin }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({...formData, [name]: value});
+    let filteredValue = value;
+    if (name === 'phone') {
+      filteredValue = value.replace(/[^\d\s\-()\+]/g, '');
+    }
+    setFormData({...formData, [name]: filteredValue});
 
-    if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors({...errors, [name]: error});
+    const error = validateField(name, filteredValue);
+    setErrors({...errors, [name]: error});
+
+    // Revalidate confirmPassword if password changes and confirmPassword is touched
+    if (name === 'password' && touched.confirmPassword) {
+      const confirmError = validateField('confirmPassword', formData.confirmPassword);
+      setErrors(prev => ({...prev, confirmPassword: confirmError}));
     }
   };
 
@@ -196,7 +204,7 @@ const Signup = ({ onSwitchToLogin }) => {
           </div>
         </div>
 
-        <button type="submit" className="signup-signup-btn">Sign Up</button>
+        <button type="submit" className="signup-signup-btn" disabled={Object.values(errors).some(error => error)}>Sign Up</button>
       </form>
 
       <div className="signup-switch-auth">
