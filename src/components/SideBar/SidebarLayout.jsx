@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import api from '../api';
+import api from '../../api';
 import './SidebarLayout.css';
 
 const SidebarLayout = () => {

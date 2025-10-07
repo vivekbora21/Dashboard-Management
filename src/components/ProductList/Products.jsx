@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import api from '../api';
+import api from '../../api';
 import './Products.css';
+import { AiFillDelete } from 'react-icons/ai';
+import { HiOutlinePencilAlt } from 'react-icons/hi';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -140,8 +142,8 @@ const Products = () => {
                 <td>{product.discounts.toLocaleString('en-IN')} ₹</td>
                 <td>{product.soldDate}</td>
                 <td>
-                  <button className="update-btn" onClick={() => handleUpdate(product)}>Update</button>
-                  <button className="delete-btn" onClick={() => handleDelete(product.id)}>Delete</button>
+                  <button className="update-btn" onClick={() => handleUpdate(product)}><HiOutlinePencilAlt/></button>
+                  <button className="delete-btn" onClick={() => handleDelete(product.id)}><AiFillDelete /></button>
                 </td>
               </tr>
             );

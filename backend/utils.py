@@ -13,7 +13,6 @@ def parse_date(date_str: str) -> Optional[str]:
     for fmt in date_formats:
         try:
             dt = datetime.strptime(date_str.strip(), fmt).date()
-            print(dt.strftime("%Y-%m-%d"))
             return dt.strftime("%Y-%m-%d")
         except ValueError:
             continue

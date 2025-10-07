@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import api from "../api.js";
+import api from "../../api.js";
 import "./AddProduct.css";
 
 const AddProduct = () => {

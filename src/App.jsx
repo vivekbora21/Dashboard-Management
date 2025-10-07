@@ -2,15 +2,15 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Signup from './components/SignupForm';
-import Login from './components/LoginForm';
-import Dashboard from './components/dashboard.jsx';
-import AddProduct from './components/AddProduct.jsx';
-import SidebarLayout from './components/SidebarLayout.jsx';
-import Products from './components/Products.jsx';
-import Customers from './components/Customers.jsx';
-import Statistics from './components/Statistics.jsx';
-import NotFound from './components/NotFound.jsx';
+import Signup from './components/Signup/SignupForm';
+import Login from './components/Login/LoginForm';
+import Dashboard from './components/Dashboard/dashboard.jsx';
+import AddProduct from './components/AddProduct/AddProduct.jsx';
+import SidebarLayout from './components/SideBar/SidebarLayout.jsx';
+import Products from './components/ProductList/Products.jsx';
+import Customers from './components/Profile/Customers.jsx';
+import Statistics from './components/Statistics/Statistics.jsx';
+import NotFound from './components/Invalid/NotFound.jsx';
 import './components/AppStyle.css'
 
 function App() {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from '../api';
+import api from '../../api';
 import './dashboard.css';
 
 const Dashboard = () => {
@@ -21,7 +21,7 @@ const Dashboard = () => {
       .then(response => {
         const allProducts = response.data.map(p => {
           const discount = parseFloat(p.discounts) || 0;
-          const profit = (p.quantity * p.sellingPrice) - (p.quantity * p.productPrice) - (p.quantity * discount);
+          const profit = (p.quantity * p.sellingPrice) - (p.quantity * p.productPrice);
           return { ...p, profit };
         });
 

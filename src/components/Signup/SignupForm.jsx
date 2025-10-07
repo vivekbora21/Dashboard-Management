@@ -75,7 +75,6 @@ const Signup = ({ onSwitchToLogin }) => {
     const { name, value } = e.target;
     setFormData({...formData, [name]: value});
 
-    // Validate field if it's been touched before
     if (touched[name]) {
       const error = validateField(name, value);
       setErrors({...errors, [name]: error});
@@ -85,10 +84,7 @@ const Signup = ({ onSwitchToLogin }) => {
   const handleBlur = (e) => {
     const { name, value } = e.target;
 
-    // Mark field as touched
     setTouched({...touched, [name]: true});
-
-    // Validate the field
     const error = validateField(name, value);
     setErrors({...errors, [name]: error});
   };
@@ -113,16 +109,12 @@ const Signup = ({ onSwitchToLogin }) => {
 
     if (validateForm()) {
       try {
-      // Sending POST request to FastAPI backend
       const payload = { ...formData };
       const response = await axios.post("http://localhost:8000/signup/", payload);
       console.log(response.data);
       toast.success("Account created successfully!");
 
-      // Store the access token
-      localStorage.setItem("access_token", response.data.access_token);
 
-      // Reset the form
       setFormData({
         firstName: "",
         lastName: "",
@@ -133,7 +125,7 @@ const Signup = ({ onSwitchToLogin }) => {
       });
       setErrors({});
       setTouched({});
-      navigate('/dashboard');
+      navigate('/login');
       } catch (error) {
         console.log(error.response?.data);
         console.error("Error during signup:", error.response?.data?.detail || error.message);

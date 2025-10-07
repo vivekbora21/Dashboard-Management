@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 import models
 import schemas
 import auth
@@ -32,6 +32,16 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     if user is None:
         raise credentials_exception
     return user
+
+def excel_date_to_date(excel_value):
+    if isinstance(excel_value, datetime):
+        return excel_value.date()
+    elif isinstance(excel_value, date):
+        return excel_value
+    elif isinstance(excel_value, str):
+        return parse_date(excel_value)
+    else:
+        return None
 
 origins = ["http://localhost:3001","http://127.0.0.1:3001"]
 app.add_middleware(
@@ -179,6 +189,7 @@ def upload_excel(
     inserted_products = []
     for index, row in df.iterrows():
         try:
+            soldDate = excel_date_to_date(row.get("soldOn"))
             product_data = models.Product(
                 productName=row.get("productName"),
                 productCategory=row.get("productCategory"),
@@ -188,7 +199,7 @@ def upload_excel(
                 userId=current_user.id,
                 ratings=float(row.get("ratings")) if not pd.isna(row.get("ratings")) else None,
                 discounts=row.get("discounts") if not pd.isna(row.get("discounts")) else None,
-                soldDate=parse_date(str(row.get("soldDate"))) if not pd.isna(row.get("soldDate")) else None
+                soldDate=soldDate
             )
             db.add(product_data)
             db.commit()
