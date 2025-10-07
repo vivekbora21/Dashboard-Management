@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import api from '../../api';
 import './dashboard.css';
 
@@ -16,53 +16,62 @@ const Dashboard = () => {
   });
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
-  useEffect(() => {
-    api.get("/products/")
-      .then(response => {
-        const allProducts = response.data.map(p => {
-          const discount = parseFloat(p.discounts) || 0;
-          const profit = (p.quantity * p.sellingPrice) - (p.quantity * p.productPrice);
-          return { ...p, profit };
-        });
+  const fetchStats = useCallback(async () => {
+    try {
+      const [
+        totalSalesRes,
+        totalProfitRes,
+        avgRatingRes,
+        totalOrdersRes,
+        totalQuantityRes,
+        highestSellingRes,
+        highestProfitRes,
+        avgDiscountRes
+      ] = await Promise.all([
+        api.get("/kpi/total_sales"),
+        api.get("/kpi/total_profit"),
+        api.get("/kpi/avg_rating"),
+        api.get("/kpi/total_orders"),
+        api.get("/kpi/total_quantity"),
+        api.get("/kpi/highest_selling_product"),
+        api.get("/kpi/highest_profit_product"),
+        api.get("/kpi/avg_discount")
+      ]);
 
-        const totalSales = allProducts.reduce((sum, p) => sum + (p.sellingPrice * p.quantity), 0);
-        const totalProfit = allProducts.reduce((sum, p) => sum + p.profit, 0);
-        const totalRatings = allProducts.reduce((sum, p) => sum + (p.ratings || 0), 0);
-        const avgRating = allProducts.length > 0 ? totalRatings / allProducts.length : 0;
-        const totalOrders = allProducts.length;
-        const totalQuantity = allProducts.reduce((sum, p) => sum + p.quantity, 0);
-        const highestSellingProduct = allProducts.reduce((prev, curr) => 
-          (curr.sellingPrice * curr.quantity) > (prev.sellingPrice * prev.quantity) ? curr : prev, allProducts[0]
-        );
-        const highestProfitProduct = allProducts.reduce((prev, curr) => curr.profit > prev.profit ? curr : prev, allProducts[0]);
-        const avgDiscount = allProducts.reduce((sum, p) => sum + (parseFloat(p.discounts) || 0), 0) / allProducts.length;
-
-        setStats({
-          totalSales,
-          totalProfit,
-          avgRating,
-          totalOrders,
-          totalQuantity,
-          highestSellingProduct,
-          highestProfitProduct,
-          avgDiscount
-        });
-
-        const topProducts = allProducts
-          .sort((a, b) => b.profit - a.profit)
-          .slice(0, 5);
-        setProducts(topProducts);
-      })
-      .catch(error => {
-        console.error("Error fetching products:", error);
+      setStats({
+        totalSales: totalSalesRes.data.value,
+        totalProfit: totalProfitRes.data.value,
+        avgRating: avgRatingRes.data.value,
+        totalOrders: totalOrdersRes.data.value,
+        totalQuantity: totalQuantityRes.data.value,
+        highestSellingProduct: highestSellingRes.data,
+        highestProfitProduct: highestProfitRes.data,
+        avgDiscount: avgDiscountRes.data.value
       });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  }, []);
+
+  const fetchTopProducts = useCallback(async () => {
+    try {
+      const productsResponse = await api.get("/kpi/top_profit_products", { params: { limit: 5 } });
+      setProducts(productsResponse.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+    fetchTopProducts();
 
     const interval = setInterval(() => {
       setCurrentDateTime(new Date());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchStats, fetchTopProducts]);
 
   const formattedDateTime = currentDateTime.toLocaleDateString('en-US', 
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
@@ -124,7 +133,6 @@ const Dashboard = () => {
         </div>
       </section>
 
-      {/* Top Products Table */}
       <section className="products-table">
         <div className="products-header">
           <h4>Top 5 Products based on Profits</h4>

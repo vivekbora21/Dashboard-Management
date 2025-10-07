@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import api from '../../api';
 import './Products.css';
@@ -7,6 +7,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -30,21 +31,22 @@ const Products = () => {
   ];
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(currentPage);
+  }, [currentPage]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async (page) => {
+    setLoading(true);
     try {
-      const response = await api.get('/products/');
-      const sortedProducts = response.data.sort((a, b) => new Date(b.soldDate) - new Date(a.soldDate));
-      setProducts(sortedProducts);
+      const response = await api.get('/products/', { params: { page, limit: itemsPerPage } });
+      setProducts(response.data.products);
+      setTotalProducts(response.data.total);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error('Failed to load products');
     } finally {
       setLoading(false);
     }
-  };
+  }, [itemsPerPage]);
 
   const handleUpdate = (product) => {
     setEditingProduct(product);
@@ -62,44 +64,43 @@ const Products = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (productId) => {
+  const handleDelete = useCallback(async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await api.delete(`/products/${productId}`);
         toast.success('Product deleted successfully');
-        fetchProducts();
+        fetchProducts(currentPage);
       } catch (error) {
         console.error('Error deleting product:', error);
         toast.error('Failed to delete product');
       }
     }
-  };
+  }, [currentPage, fetchProducts]);
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = useCallback(async (e) => {
     e.preventDefault();
     try {
       await api.put(`/products/${editingProduct.id}`, formData);
       toast.success('Product updated successfully');
       setShowModal(false);
-      fetchProducts();
+      fetchProducts(currentPage);
     } catch (error) {
       console.error('Error updating product:', error);
       toast.error('Failed to update product');
     }
-  };
+  }, [editingProduct, formData, currentPage, fetchProducts]);
 
   const closeModal = () => {
     setShowModal(false);
     setEditingProduct(null);
   };
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+  const currentProducts = products;
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

@@ -143,3 +143,51 @@ def get_summary(db: Session, period: str, user_id: int):
     ).group_by(models.Product.soldDate).all()
 
     return [{'date': str(r.soldDate), 'sales': float(r.sales), 'profit': float(r.profit)} for r in results]
+
+def get_stats(db: Session, user_id: int):
+    products = db.query(models.Product).filter(models.Product.userId == user_id).all()
+    if not products:
+        return {
+            "totalSales": 0,
+            "totalProfit": 0,
+            "avgRating": 0,
+            "totalOrders": 0,
+            "totalQuantity": 0,
+            "highestSellingProduct": None,
+            "highestProfitProduct": None,
+            "avgDiscount": 0
+        }
+
+    total_sales = sum(p.sellingPrice * p.quantity for p in products)
+    total_profit = sum((p.sellingPrice - p.productPrice) * p.quantity for p in products)
+    ratings = [p.ratings for p in products if p.ratings is not None]
+    avg_rating = sum(ratings) / len(ratings) if ratings else 0
+    total_orders = len(products)
+    total_quantity = sum(p.quantity for p in products)
+    highest_selling = max(products, key=lambda p: p.sellingPrice * p.quantity)
+    highest_profit = max(products, key=lambda p: (p.sellingPrice - p.productPrice) * p.quantity)
+    discounts = [float(p.discounts) for p in products if p.discounts]
+    avg_discount = sum(discounts) / len(discounts) if discounts else 0
+
+    return {
+        "totalSales": total_sales,
+        "totalProfit": total_profit,
+        "avgRating": avg_rating,
+        "totalOrders": total_orders,
+        "totalQuantity": total_quantity,
+        "highestSellingProduct": {
+            "id": highest_selling.id,
+            "productName": highest_selling.productName
+        },
+        "highestProfitProduct": {
+            "id": highest_profit.id,
+            "productName": highest_profit.productName
+        },
+        "avgDiscount": avg_discount
+    }
+
+def get_products_paginated(db: Session, user_id: int, page: int = 1, limit: int = 10):
+    offset = (page - 1) * limit
+    products = db.query(models.Product).filter(models.Product.userId == user_id).order_by(models.Product.soldDate.desc()).offset(offset).limit(limit).all()
+    total = db.query(models.Product).filter(models.Product.userId == user_id).count()
+    return products, total
