@@ -56,17 +56,15 @@ const AddProduct = () => {
   const handleManualSubmit = async (e) => {
     e.preventDefault();
 
-    // Prepare data with correct types
     const dataToSend = {
       productName: formData.productName,
       productCategory: formData.productCategory,
       productPrice: parseFloat(formData.productPrice),
       sellingPrice: parseFloat(formData.sellingPrice),
       quantity: parseInt(formData.quantity, 10),
-      userId: 0, // userId will be set by backend from token/session
+      userId: 0, 
     };
 
-    // Optional fields: only add if valid
     if (formData.ratings !== "" && !isNaN(parseFloat(formData.ratings))) {
       dataToSend.ratings = parseFloat(formData.ratings);
     }
@@ -79,11 +77,8 @@ const AddProduct = () => {
 
     try {
       const res = await api.post("/manual-update/", dataToSend);
-
       toast.success("Manual product added successfully");
-
       setUploadedProducts((prev) => [...prev, res.data.productName]);
-
       navigate("/dashboard/products");
     } catch (err) {
       console.error(err);
@@ -121,6 +116,7 @@ const AddProduct = () => {
           }}
         >
           📁 Upload Products
+          <p>Add upto 10 data at once</p>
         </div>
         <div
           className="card-option"
@@ -130,6 +126,7 @@ const AddProduct = () => {
           }}
         >
           ✏️ Add Manually
+          <p>Add one product at a time</p>
         </div>
       </div>
 
@@ -172,26 +169,11 @@ const AddProduct = () => {
           <form onSubmit={handleManualSubmit} className="product-form">
             <div className="form-group">
               <label htmlFor="productName">Product Name *</label>
-              <input
-                type="text"
-                id="productName"
-                name="productName"
-                value={formData.productName}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
+              <input type="text" id="productName" name="productName" value={formData.productName}onChange={handleChange} required className="form-input"/>
             </div>
             <div className="form-group">
               <label htmlFor="productCategory">Product Category *</label>
-              <select
-                id="productCategory"
-                name="productCategory"
-                value={formData.productCategory}
-                onChange={handleChange}
-                required
-                className="form-input"
-              >
+              <select id="productCategory" name="productCategory" value={formData.productCategory} onChange={handleChange} required className="form-input">
                 <option value="">Select a category</option>
                 <option value="Laptops">Laptops</option>
                 <option value="Electronics">Electronics</option>
@@ -207,77 +189,29 @@ const AddProduct = () => {
             </div>
             <div className="form-group">
               <label htmlFor="productPrice">Product Price (₹)*</label>
-              <input
-                type="number"
-                id="productPrice"
-                name="productPrice"
-                value={formData.productPrice}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
+              <input type="number" id="productPrice" name="productPrice" value={formData.productPrice} onChange={handleChange} required className="form-input"/>
             </div>
             <div className="form-group">
               <label htmlFor="sellingPrice">Selling Price (₹)*</label>
-              <input
-                type="number"
-                id="sellingPrice"
-                name="sellingPrice"
-                value={formData.sellingPrice}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
+              <input type="number" id="sellingPrice" name="sellingPrice" value={formData.sellingPrice} onChange={handleChange} required className="form-input"/>
             </div>
             <div className="form-group">
               <label htmlFor="quantity">Quantity *</label>
-              <input
-                type="number"
-                id="quantity"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
+              <input type="number" id="quantity" name="quantity" value={formData.quantity} onChange={handleChange} required className="form-input"/>
             </div>
             <div className="form-group">
               <label htmlFor="ratings">Ratings (out of 5)</label>
-              <input
-                type="number"
-                step="0.1"
-                id="ratings"
-                name="ratings"
-                value={formData.ratings}
-                onChange={handleChange}
-                className="form-input"
-              />
+              <input type="number" step="0.1" id="ratings" name="ratings" value={formData.ratings} onChange={handleChange} className="form-input"/>
             </div>
             <div className="form-group">
               <label htmlFor="discounts">Discounts (₹)</label>
-              <input
-                type="text"
-                id="discounts"
-                name="discounts"
-                value={formData.discounts}
-                onChange={handleChange}
-                className="form-input"
-              />
+              <input type="text" id="discounts" name="discounts" value={formData.discounts} onChange={handleChange} className="form-input"/>
             </div>
             <div className="form-group">
               <label htmlFor="soldDate">Sold Date</label>
-              <input
-                type="date"
-                id="soldDate"
-                name="soldDate"
-                value={formData.soldDate}
-                onChange={handleChange}
-                className="form-input"
-              />
+              <input type="date" id="soldDate" name="soldDate" value={formData.soldDate} onChange={handleChange} className="form-input" />
             </div>
-            <button type="submit" className="submit-btn">
-              Save Product
-            </button>
+            <button type="submit" className="submit-btn">Save Product</button>
           </form>
         </section>
       )}

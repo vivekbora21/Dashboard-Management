@@ -11,9 +11,12 @@ import io
 import crud
 from database import engine, get_db
 from utils import parse_date
+from statistics import router as statistics_router
 
 app = FastAPI()
+app.include_router(statistics_router)
 models.Base.metadata.create_all(bind=engine)
+MAX_ROWS = 10
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
@@ -153,14 +156,10 @@ def get_products_by_date(
     products = crud.get_products_by_date(db, date, current_user.id)
     return products
 
-# Get summary for period
 @app.get("/products/summary")
 def get_summary(period: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # period can be 'week', 'month' or 'YYYY-MM' for specific month
     summary = crud.get_summary(db, period, current_user.id)
     return summary
-
-MAX_ROWS = 10
 
 @app.post("/upload-excel/")
 def upload_excel(

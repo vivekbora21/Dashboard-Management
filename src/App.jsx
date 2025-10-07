@@ -7,8 +7,7 @@ import Login from './components/LoginForm';
 import Dashboard from './components/dashboard.jsx';
 import AddProduct from './components/AddProduct.jsx';
 import SidebarLayout from './components/SidebarLayout.jsx';
-import Products from './components/Products.jsx'
-import Settings  from './components/Settings.jsx';
+import Products from './components/Products.jsx';
 import Customers from './components/Customers.jsx';
 import Statistics from './components/Statistics.jsx';
 import NotFound from './components/NotFound.jsx';
@@ -27,9 +26,7 @@ function App() {
           <Route path="addproduct" element={<AddProduct />} />
           <Route path="products" element={<Products />} />
           <Route path="customers" element={<Customers />} />
-          <Route path="statistics" element={<Statistics />} />
-          <Route path="settings" element={<Settings />} />  
-          <Route path="*" element={<NotFound />} />  
+          <Route path="statistics" element={<Statistics />} />  
         </Route>
       </Routes>
       <ToastContainer />

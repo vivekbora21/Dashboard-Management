@@ -10,11 +10,11 @@ const Customers = () => {
     toast.info("Customers page is in development mode, Please visit after some time");
     setTimeout(() => {
       navigate("/dashboard");
-    }, 2000); 
+    }, 3000); 
   }, [navigate]);
 
   return (
-    <div>
+    <div className='customers-content'>
       <p>
         <p></p>
         <h1>Coming soon...</h1>

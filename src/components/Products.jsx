@@ -95,7 +95,6 @@ const Products = () => {
     setEditingProduct(null);
   };
 
-  // Pagination logic
   const totalPages = Math.ceil(products.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
@@ -175,7 +174,6 @@ const Products = () => {
           </button>
         </div>
       )}
-
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -183,94 +181,38 @@ const Products = () => {
             <form onSubmit={handleFormSubmit} className="product-form">
               <div className="form-group">
                 <label>Product Name *</label>
-                <input
-                  type="text"
-                  name="productName"
-                  value={formData.productName}
-                  onChange={handleFormChange}
-                  required
-                />
+                <input type="text" name="productName" value={formData.productName} onChange={handleFormChange} required />
               </div>
               <div className="form-group">
                 <label>Product Category *</label>
-                <select
-                  name="productCategory"
-                  value={formData.productCategory}
-                  onChange={handleFormChange}
-                  required
-                >
+                <select name="productCategory" value={formData.productCategory} onChange={handleFormChange} required >
                   <option value="">Select a category</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
+                  {categories.map((cat) => (<option key={cat} value={cat}>{cat}</option>))}
                 </select>
               </div>
               <div className="form-group">
                 <label>Product Price (₹) *</label>
-                <input
-                  type="number"
-                  name="productPrice"
-                  value={formData.productPrice}
-                  onChange={handleFormChange}
-                  required
-                />
+                <input type="number" name="productPrice" value={formData.productPrice} onChange={handleFormChange} required />
               </div>
               <div className="form-group">
                 <label>Selling Price (₹) *</label>
-                <input
-                  type="number"
-                  name="sellingPrice"
-                  value={formData.sellingPrice}
-                  onChange={handleFormChange}
-                  required
-                />
+                <input type="number" name="sellingPrice" value={formData.sellingPrice} onChange={handleFormChange} required />
               </div>
               <div className="form-group">
                 <label>Quantity *</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleFormChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>User ID *</label>
-                <input
-                  type="number"
-                  name="userId"
-                  value={formData.userId}
-                  onChange={handleFormChange}
-                  required
-                />
+                <input type="number" name="quantity" value={formData.quantity} onChange={handleFormChange} required />
               </div>
               <div className="form-group">
                 <label>Ratings</label>
-                <input
-                  type="number"
-                  name="ratings"
-                  value={formData.ratings}
-                  onChange={handleFormChange}
-                />
+                <input type="number" name="ratings" value={formData.ratings} onChange={handleFormChange} />
               </div>
               <div className="form-group">
                 <label>Discounts</label>
-                <input
-                  type="text"
-                  name="discounts"
-                  value={formData.discounts}
-                  onChange={handleFormChange}
-                />
+                <input type="text" name="discounts" value={formData.discounts} onChange={handleFormChange} />
               </div>
               <div className="form-group">
                 <label>Sold Date</label>
-                <input
-                  type="date"
-                  name="soldDate"
-                  value={formData.soldDate}
-                  onChange={handleFormChange}
-                />
+                <input type="date" name="soldDate" value={formData.soldDate} onChange={handleFormChange} />
               </div>
               <div className="form-actions">
                 <button type="submit" className="submit-btn">Update Product</button>
@@ -285,4 +227,3 @@ const Products = () => {
 };
 
 export default Products;
-

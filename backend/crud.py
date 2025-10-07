@@ -4,6 +4,8 @@ import schemas
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 from utils import parse_date
+from datetime import datetime, timedelta
+from sqlalchemy import func, extract
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -28,11 +30,9 @@ def create_user(db: Session, user: schemas.UserCreate):
         raise Exception("User already exists!")
 
 def create_product(db: Session, product: schemas.ProductCreate):
-    # Normalize soldDate before saving
     normalized_date = None
     if product.soldDate:
         try:
-            # product.soldDate can be date or str, convert to str for parsing
             normalized_date = parse_date(str(product.soldDate))
         except ValueError as e:
             raise Exception(f"Invalid date format for soldDate: {e}")
@@ -87,27 +87,41 @@ def get_products_by_date(db: Session, date: str, user_id: int):
         return []
 
 def get_summary(db: Session, period: str, user_id: int):
-    from datetime import datetime, timedelta
-    from sqlalchemy import func, extract
-
     today = datetime.now().date()
-
-    # If period is in 'YYYY-MM' format, filter by that month
     try:
         if len(period) == 7 and period[4] == '-':
+            from datetime import datetime, timedelta
             year = int(period[:4])
             month = int(period[5:7])
+            start_date = datetime(year, month, 1).date()
+            if month == 12:
+                end_date = datetime(year + 1, 1, 1).date()
+            else:
+                end_date = datetime(year, month + 1, 1).date()
+
             results = db.query(
                 models.Product.soldDate,
-                func.sum(models.Product.sellingPrice).label('sales'),
-                func.sum(models.Product.sellingPrice - models.Product.productPrice).label('profit')
+                func.sum((models.Product.sellingPrice - models.Product.discounts) * models.Product.quantity).label('sales'),
+                func.sum((models.Product.sellingPrice - models.Product.productPrice - models.Product.discounts) * models.Product.quantity).label('profit')
             ).filter(
-                extract('year', models.Product.soldDate) == year,
-                extract('month', models.Product.soldDate) == month,
+                models.Product.soldDate >= start_date,
+                models.Product.soldDate < end_date,
                 models.Product.userId == user_id
             ).group_by(models.Product.soldDate).all()
 
-            return [{'date': str(r.soldDate), 'sales': float(r.sales), 'profit': float(r.profit)} for r in results]
+            data_dict = {str(r.soldDate): {'sales': float(r.sales), 'profit': float(r.profit)} for r in results}
+            all_days = []
+            current = start_date
+            while current < end_date:
+                day_str = str(current)
+                all_days.append({
+                    'date': day_str,
+                    'sales': data_dict.get(day_str, {}).get('sales', 0.0),
+                    'profit': data_dict.get(day_str, {}).get('profit', 0.0)
+                })
+                current += timedelta(days=1)
+
+            return all_days
     except Exception:
         pass
 

@@ -13,14 +13,12 @@ const SidebarLayout = () => {
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
-      // Still navigate to login even if logout fails
       navigate('/login');
     }
   };
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
       <aside className="sidebar">
         <h6 className="logo">DashBoardManager</h6>
         <nav>
@@ -30,7 +28,6 @@ const SidebarLayout = () => {
             <li className={location.pathname === "/dashboard/statistics" ? "active" : ""}><Link to="/dashboard/statistics">Statistic</Link></li>
             <li className={location.pathname === "/dashboard/products" ? "active" : ""}><Link to="/dashboard/products">Product</Link></li>
             <li className={location.pathname === "/dashboard/customers" ? "active" : ""}><Link to="/dashboard/customers">Customer</Link></li>
-            <li className={location.pathname === "/dashboard/settings" ? "active" : ""}><Link to="/dashboard/settings">Settings</Link></li>
           </ul>
         </nav>
         <div className="logout-section">
@@ -38,9 +35,8 @@ const SidebarLayout = () => {
         </div>
       </aside>
 
-      {/* Main content changes depending on route */}
       <main className="main-content">
-        <Outlet /> {/* This is where page content will render */}
+        <Outlet />
       </main>
     </div>
   );
