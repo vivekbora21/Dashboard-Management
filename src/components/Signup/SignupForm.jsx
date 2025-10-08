@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
+import api from "../../api";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './SignupForm.css';
@@ -82,7 +83,6 @@ const Signup = ({ onSwitchToLogin }) => {
     const error = validateField(name, filteredValue);
     setErrors({...errors, [name]: error});
 
-    // Revalidate confirmPassword if password changes and confirmPassword is touched
     if (name === 'password' && touched.confirmPassword) {
       const confirmError = validateField('confirmPassword', formData.confirmPassword);
       setErrors(prev => ({...prev, confirmPassword: confirmError}));
@@ -118,10 +118,9 @@ const Signup = ({ onSwitchToLogin }) => {
     if (validateForm()) {
       try {
       const payload = { ...formData };
-      const response = await axios.post("http://localhost:8000/signup/", payload);
+      const response = await api.post("/signup/", payload);
       console.log(response.data);
       toast.success("Account created successfully!");
-
 
       setFormData({
         firstName: "",
@@ -177,7 +176,7 @@ const Signup = ({ onSwitchToLogin }) => {
           </div>
           <div className="signup-form-group">
             <label htmlFor="phone">Phone Number<span>*</span></label>
-            <input type="tel" id="phone" name="phone" value={formData.phone}
+            <input type="tel" id="phone" name="phone" value={formData.phone} maxLength={10}
               onChange={handleChange} onBlur={handleBlur} className={errors.phone ? "signup-error" : ""}
               required
             />

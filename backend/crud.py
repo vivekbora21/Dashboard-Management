@@ -38,7 +38,7 @@ def create_product(db: Session, product: schemas.ProductCreate):
             raise Exception(f"Invalid date format for soldDate: {e}")
 
     db_product = models.Product(
-        productName=product.productName,
+        productName=product.productName.capitalize() if product.productName else product.productName,
         productCategory=product.productCategory,
         productPrice=product.productPrice,
         sellingPrice=product.sellingPrice,
@@ -65,6 +65,8 @@ def update_product(db: Session, product_id: int, product: schemas.ProductCreate,
     if not db_product:
         return None
     for key, value in product.dict().items():
+        if key == 'productName':
+            value = value.capitalize() if value else value
         setattr(db_product, key, value)
     db.commit()
     db.refresh(db_product)
@@ -177,11 +179,11 @@ def get_stats(db: Session, user_id: int):
         "totalQuantity": total_quantity,
         "highestSellingProduct": {
             "id": highest_selling.id,
-            "productName": highest_selling.productName
+            "productName": highest_selling.productName.capitalize() if highest_selling.productName else highest_selling.productName
         },
         "highestProfitProduct": {
             "id": highest_profit.id,
-            "productName": highest_profit.productName
+            "productName": highest_profit.productName.capitalize() if highest_profit.productName else highest_profit.productName
         },
         "avgDiscount": avg_discount
     }

@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../contexts/AuthContext';
 import './LoginForm.css';
 
 const Login = ({ onSwitchToSignup }) => {
   const [formData, setFormData] = useState({email: '',password: ''})
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
 
@@ -71,6 +73,8 @@ const Login = ({ onSwitchToSignup }) => {
 
         console.log("Login response:", response.data);
         toast.success("Login successful!");
+
+        login(response.data.user);
 
         setFormData({ email: "", password: "" });
         setErrors({});

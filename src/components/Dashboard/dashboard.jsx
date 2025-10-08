@@ -91,13 +91,13 @@ const Dashboard = () => {
   return (
     <div className="dashboard-page">
       <div className="page-header">
-        <h1>Welcome! Here's your dashboard summary</h1>
+        <h1>Welcome! Here's your Dashboard summary</h1>
         <p>{formattedDateTime}</p>
       </div>
 
       <section className="stats-grid">
         {statItems.map((item, index) => (
-          <StatCard key={index} icon={item.icon} title={item.title} value={item.value} />
+          <StatCard key={index} icon={item.icon} title={item.title} value={item.value.charAt(0).toUpperCase() + item.value.slice(1)} />
         ))}
       </section>
 
@@ -121,7 +121,7 @@ const Dashboard = () => {
           <tbody>
             {products.map((p) => (
               <tr key={p.id}>
-                <td>{p.productName}</td>
+                <td>{p.productName.charAt(0).toUpperCase() + p.productName.slice(1)}</td>
                 <td>{p.productCategory}</td>
                 <td>{p.productPrice.toLocaleString('en-IN')} ₹</td>
                 <td>{p.quantity}</td>

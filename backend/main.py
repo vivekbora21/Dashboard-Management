@@ -13,6 +13,7 @@ from database import engine, get_db
 from utils import parse_date
 from statistics import router as statistics_router
 import kpis
+import validation
 
 app = FastAPI()
 app.include_router(statistics_router)
@@ -56,12 +57,8 @@ app.add_middleware(
 # Signup
 @app.post("/signup/", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
+    validation.validate_signup(db, user)
     hashed_pw = auth.hash_password(user.password)
-
     new_user = models.User(
         firstName=user.firstName,
         lastName=user.lastName,
@@ -76,20 +73,13 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
 #Login
 @app.post("/login/")
 def login(user: schemas.UserLogin, response: Response, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
-    if not db_user:
-        raise HTTPException(status_code=400, detail="Invalid email or password")
-
-    if not auth.verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(status_code=400, detail="Invalid email or password")
-
+    db_user = validation.validate_login(db, user)
     access_token = auth.create_access_token(data={"sub": db_user.email})
-
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False, 
+        secure=False,
         samesite="lax",
         max_age=auth.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
@@ -171,6 +161,7 @@ def get_user_profile(current_user: models.User = Depends(get_current_user)):
 # Update user profile
 @app.put("/user/profile", response_model=schemas.UserOut)
 def update_user_profile(user: schemas.UserUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    validation.validate_update_user(db, current_user.id, user)
     updated_user = crud.update_user(db, current_user.id, user)
     if not updated_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -248,7 +239,7 @@ def upload_excel(
         try:
             soldDate = excel_date_to_date(row.get("soldOn"))
             product_data = models.Product(
-                productName=row.get("productName"),
+                productName=row.get("productName").capitalize() if row.get("productName") else row.get("productName"),
                 productCategory=row.get("productCategory"),
                 productPrice=float(row.get("productPrice")),
                 sellingPrice=float(row.get("sellingPrice")),

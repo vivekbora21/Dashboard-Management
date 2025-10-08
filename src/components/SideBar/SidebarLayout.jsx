@@ -1,20 +1,16 @@
 import React from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import api from '../../api';
+import { useAuth } from '../../contexts/AuthContext';
 import './SidebarLayout.css';
 
 const SidebarLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
-    try {
-      await api.post('/logout/');
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      navigate('/login');
-    }
+    await logout();
+    navigate('/login');
   };
 
   return (

@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './components/AppStyle.css';
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
 
 const Signup = lazy(() => import('./components/Signup/SignupForm'));
 const Login = lazy(() => import('./components/Login/LoginForm'));
@@ -19,11 +21,11 @@ function App() {
     <Router>
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
           <Route path="*" element={<NotFound />} />
-          <Route path="/dashboard" element={<SidebarLayout />}>
+          <Route path="/dashboard" element={<ProtectedRoute><SidebarLayout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="addproduct" element={<AddProduct />} />
             <Route path="products" element={<Products />} />

@@ -135,7 +135,7 @@ const Products = () => {
             return (
               <tr key={product.id}>
                 <td>{slNo}</td>
-                <td>{product.productName}</td>
+                <td>{product.productName.charAt(0).toUpperCase() + product.productName.slice(1)}</td>
                 <td>{product.productCategory}</td>
                 <td>{product.productPrice.toLocaleString('en-IN')} ₹</td>
                 <td>{product.sellingPrice.toLocaleString('en-IN')} ₹</td>

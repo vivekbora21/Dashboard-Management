@@ -81,7 +81,7 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
         .all()
     )
     top_products_data = [
-        {"productName": n, "quantity": int(q or 0)} for n, q in top_products
+        {"productName": n.capitalize() if n else n, "quantity": int(q or 0)} for n, q in top_products
     ]
 
     profit_per_product = (
@@ -96,7 +96,7 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
     )
 
     profit_per_product_data = [
-        {"productName": name, "profit": float(profit or 0)} for name, profit in profit_per_product
+        {"productName": name.capitalize() if name else name, "profit": float(profit or 0)} for name, profit in profit_per_product
         ]
 
     daily_sales = (
