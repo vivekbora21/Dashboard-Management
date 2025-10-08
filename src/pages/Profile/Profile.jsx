@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import api from '../../api';
-import './Customers.css';
+import './Profile.css';
 import { FaUserEdit } from 'react-icons/fa';
 
-const Customers = () => {
+const Profile = () => {
   const [user, setUser] = useState({
     firstName: '',
     lastName: '',
@@ -168,5 +168,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
-
+export default Profile;

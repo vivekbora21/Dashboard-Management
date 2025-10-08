@@ -1,6 +1,8 @@
 import React from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import './SidebarLayout.css';
 
 const SidebarLayout = () => {
@@ -10,6 +12,7 @@ const SidebarLayout = () => {
 
   const handleLogout = async () => {
     await logout();
+    toast.success('Logged out successfully.');
     navigate('/login');
   };
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import api from "../../api";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import './SignupForm.css';
+import './Signup.css';
 
 const Signup = ({ onSwitchToLogin }) => {
   const inputRef = useRef(null)
@@ -135,7 +135,6 @@ const Signup = ({ onSwitchToLogin }) => {
       navigate('/login');
       } catch (error) {
         console.log(error.response?.data);
-        console.error("Error during signup:", error.response?.data?.detail || error.message);
         toast.error("Error during signup: " + (error.response?.data?.detail || error.message));
       }
     }

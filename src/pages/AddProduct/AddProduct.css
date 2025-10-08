@@ -243,6 +243,8 @@ body {
   transform: translateY(-1px);
 }
 
+
+
 /* ============ RESPONSIVE ============ */
 @media (max-width: 900px) {
   .add-product-page {

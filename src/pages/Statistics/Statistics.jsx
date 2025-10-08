@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ResponsiveBar } from "@nivo/bar";
 import { ResponsiveLine } from "@nivo/line";
 import api from "../../api.js";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import "./Statistics.css";
 
 const Statistics = () => {
   const [stats, setStats] = useState(null);
+  const statsRef = useRef();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -21,7 +24,7 @@ const Statistics = () => {
 
   if (!stats) return <div className="loading">Loading statistics...</div>;
 
-  // 🔸 Format line data for Nivo
+  // Format line data for Nivo
   const salesTrendData = [
     {
       id: "Sales",
@@ -43,16 +46,32 @@ const Statistics = () => {
     },
   ];
 
+  // Download PDF function
+  const handleDownloadPDF = async () => {
+    const input = statsRef.current;
+    const canvas = await html2canvas(input, { scale: 3 , backgroundColor: "#fff", allowTaint: true});
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("statistics.pdf");
+  };
+
   return (
     <div className="statistics-page">
       <div className="page-header">
         <h1>📊 Statistical Analytics</h1>
         <p>All your important statistics at a glance</p>
+        <button className="download-btn" onClick={handleDownloadPDF}>
+          📥 Download PDF
+        </button>
       </div>
 
-      <div className="chart-grid">
-
-        {/* 🔹 Monthly Sales & Profit Trend */}
+      <div className="chart-grid" ref={statsRef}>
+        {/* Monthly Sales & Profit Trend */}
         <div className="chart-card">
           <h3>Monthly Sales & Profit Trend</h3>
           <div style={{ height: 300 }}>
@@ -83,7 +102,7 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* 🔹 Daily Sales Count */}
+        {/* Daily Sales Count */}
         <div className="chart-card">
           <h3>Daily Sales Count</h3>
           <div style={{ height: 300 }}>
@@ -114,7 +133,7 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* 🔹 Profit per Product */}
+        {/* Profit per Product */}
         <div className="chart-card">
           <h3>Profit per Product</h3>
           <div style={{ height: 300 }}>
@@ -145,7 +164,7 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* 🔹 Top 5 Selling Products */}
+        {/* Top 5 Selling Products */}
         <div className="chart-card">
           <h3>Top 5 Selling Products</h3>
           <div style={{ height: 300 }}>
@@ -176,7 +195,7 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* 🔹 Profit per Category */}
+        {/* Profit per Category */}
         <div className="chart-card">
           <h3>Profit per Category</h3>
           <div style={{ height: 300 }}>
@@ -207,7 +226,7 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* 🔹 Average Ratings per Category */}
+        {/* Average Ratings per Category */}
         <div className="chart-card">
           <h3>Average Ratings per Category</h3>
           <div style={{ height: 300 }}>

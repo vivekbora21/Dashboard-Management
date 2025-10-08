@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Response, Request, UploadFile, File
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -7,6 +8,8 @@ from datetime import datetime, date
 import models
 import schemas
 import auth
+import otp_utils
+import email_utils
 import io
 import crud
 from database import engine, get_db
@@ -14,6 +17,7 @@ from utils import parse_date
 from statistics import router as statistics_router
 import kpis
 import validation
+import os
 
 app = FastAPI()
 app.include_router(statistics_router)
@@ -182,7 +186,6 @@ def get_summary(period: str, current_user: models.User = Depends(get_current_use
     summary = crud.get_summary(db, period, current_user.id)
     return summary
 
-# KPI Endpoints
 @app.get("/kpi/total_sales")
 def get_kpi_total_sales(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return {"value": kpis.get_total_sales(db, current_user.id)}
@@ -261,3 +264,61 @@ def upload_excel(
         "message": f"{len(inserted_products)} products inserted successfully",
         "products": [p.productName for p in inserted_products]
     }
+
+# Forgot Password
+@app.post("/forgot-password/")
+def forgot_password(request: dict, db: Session = Depends(get_db)):
+    email = request.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    otp = otp_utils.generate_otp()
+    otp_utils.save_otp(db, user.id, otp)
+    email_utils.send_otp_email(email, otp)
+
+    return {"message": "OTP sent to your email"}
+
+# Verify OTP
+@app.post("/verify-otp/")
+def verify_otp(request: dict, db: Session = Depends(get_db)):
+    email = request.get("email")
+    otp = request.get("otp")
+    if not email or not otp:
+        raise HTTPException(status_code=400, detail="Email and OTP are required")
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not otp_utils.verify_otp(db, user.id, otp):
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+    reset_token = auth.create_reset_token(email)
+    return {"reset_token": reset_token}
+
+# Reset Password
+@app.post("/reset-password/")
+def reset_password(request: dict, db: Session = Depends(get_db)):
+    reset_token = request.get("reset_token")
+    new_password = request.get("new_password")
+    if not reset_token or not new_password:
+        raise HTTPException(status_code=400, detail="Reset token and new password are required")
+
+    try:
+        email = auth.verify_reset_token(reset_token)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    hashed_pw = auth.hash_password(new_password)
+    user.hashed_password = hashed_pw
+    db.commit()
+
+    return {"message": "Password reset successfully"}

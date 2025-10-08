@@ -118,7 +118,7 @@ const AddProduct = () => {
       productPrice: parseFloat(formData.productPrice),
       sellingPrice: parseFloat(formData.sellingPrice),
       quantity: parseInt(formData.quantity, 10),
-      userId: 0, 
+      userId: 0,
     };
 
     if (formData.ratings !== "" && !isNaN(parseFloat(formData.ratings))) {
@@ -206,16 +206,6 @@ const AddProduct = () => {
               ⬇ Download Sample Excel
             </a>
           </p>
-          {uploadedProducts.length > 0 && (
-            <div className="uploaded-products">
-              <h4>Uploaded Products:</h4>
-              <ul>
-                {uploadedProducts.map((p, index) => (
-                  <li key={index}>{p}</li>
-                ))}
-              </ul>
-            </div>
-          )}
         </section>
       )}
       {showManualForm && (

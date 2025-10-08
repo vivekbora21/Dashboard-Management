@@ -6,15 +6,18 @@ import './components/AppStyle.css';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
 
-const Signup = lazy(() => import('./components/Signup/SignupForm'));
-const Login = lazy(() => import('./components/Login/LoginForm'));
-const Dashboard = lazy(() => import('./components/Dashboard/dashboard.jsx'));
-const AddProduct = lazy(() => import('./components/AddProduct/AddProduct.jsx'));
-const SidebarLayout = lazy(() => import('./components/SideBar/SidebarLayout.jsx'));
-const Products = lazy(() => import('./components/ProductList/Products.jsx'));
-const Customers = lazy(() => import('./components/Profile/Customers.jsx'));
-const Statistics = lazy(() => import('./components/Statistics/Statistics.jsx'));
-const NotFound = lazy(() => import('./components/Invalid/NotFound.jsx'));
+const Signup = lazy(() => import('./pages/Signup/Signup'));
+const Login = lazy(() => import('./pages/Login/Login'));
+const ForgotPassword = lazy(() => import('./components/ForgotPassword/ForgotPassword'));
+const VerifyOTP = lazy(() => import('./pages/VerifyOTP/VerifyOTP'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword/ResetPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
+const AddProduct = lazy(() => import('./pages/AddProduct/AddProduct'));
+const SidebarLayout = lazy(() => import('./layouts/SidebarLayout/SidebarLayout'));
+const Products = lazy(() => import('./pages/Products/Products'));
+const Profile = lazy(() => import('./pages/Profile/Profile'));
+const Statistics = lazy(() => import('./pages/Statistics/Statistics'));
+const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 
 function App() {
   return (
@@ -24,12 +27,15 @@ function App() {
           <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+          <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+          <Route path="/verify-otp" element={<PublicRoute><VerifyOTP /></PublicRoute>} />
+          <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
           <Route path="*" element={<NotFound />} />
           <Route path="/dashboard" element={<ProtectedRoute><SidebarLayout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="addproduct" element={<AddProduct />} />
             <Route path="products" element={<Products />} />
-            <Route path="profile" element={<Customers />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="statistics" element={<Statistics />} />
           </Route>
         </Routes>

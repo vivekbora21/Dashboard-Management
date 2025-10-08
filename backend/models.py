@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
+from database import Base
 
 Base = declarative_base()
 
@@ -26,3 +28,13 @@ class Product(Base):
     ratings = Column(Float, nullable=True)
     discounts = Column(String(50), nullable=True)
     soldDate = Column(Date, nullable=True)
+
+
+class OTP(Base):
+    __tablename__ = "otps"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    otp_code = Column(String(6), nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)

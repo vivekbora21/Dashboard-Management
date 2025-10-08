@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import api from '../../api';
-import './dashboard.css';
-import StatCard from "../StatCard.jsx";
+import './Dashboard.css';
+import StatCard from "../../components/StatCard.jsx";
 
 const Dashboard = () => {
   const [products, setProducts] = useState([]);
@@ -74,7 +74,7 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [fetchStats, fetchTopProducts]);
 
-  const formattedDateTime = currentDateTime.toLocaleDateString('en-US', 
+  const formattedDateTime = currentDateTime.toLocaleDateString('en-US',
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
 
   const statItems = [
@@ -103,7 +103,7 @@ const Dashboard = () => {
 
       <section className="products-table">
         <div className="products-header">
-          <h4>Top 5 Products based on Profits</h4>
+          <h4>Top 5 Sales based on Profits</h4>
         </div>
         <table>
           <thead>

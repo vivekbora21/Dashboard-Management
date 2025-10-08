@@ -3,7 +3,7 @@ import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../contexts/AuthContext';
-import './LoginForm.css';
+import './Login.css';
 
 const Login = ({ onSwitchToSignup }) => {
   const [formData, setFormData] = useState({email: '',password: ''})
@@ -14,21 +14,21 @@ const Login = ({ onSwitchToSignup }) => {
 
   const validateField = (name, value) => {
     let error = ''
-    
+
     switch (name) {
       case 'email':
         if (!value) error = 'Email is required'
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Please enter a valid email address'
         break
-        
+
       case 'password':
         if (!value) error = 'Password is required'
         break
-        
+
       default:
         break
     }
-    
+
     return error
   }
 
@@ -42,9 +42,9 @@ const Login = ({ onSwitchToSignup }) => {
 
   const handleBlur = (e) => {
     const { name, value } = e.target
-    
+
     setTouched({...touched,[name]: true})
-    
+
     const error = validateField(name, value)
     setErrors({...errors,[name]: error})
   }
@@ -52,15 +52,15 @@ const Login = ({ onSwitchToSignup }) => {
   const validateForm = () => {
     const newErrors = {}
     const newTouched = {}
-    
+
     Object.keys(formData).forEach(key => {
       newTouched[key] = true
       newErrors[key] = validateField(key, formData[key])
     })
-    
+
     setTouched(newTouched)
     setErrors(newErrors)
-    
+
     return !Object.values(newErrors).some(error => error)
   }
 
@@ -112,7 +112,7 @@ const Login = ({ onSwitchToSignup }) => {
           {errors.password && <span className="login-error-message">{errors.password}</span>}
         </div>
         <div style={{ paddingBottom: '20px', fontSize: '14px' }}>
-          <a className="login-link" href="#">Forgot Password</a>
+          <span className="login-link" onClick={() => navigate('/forgot-password')}>Forgot Password?</span>
         </div>
 
 

@@ -7,9 +7,10 @@ import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = "your-secret-key" 
+SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+RESET_TOKEN_EXPIRE_MINUTES = 10
 
 def hash_password(password: str):
     return pwd_context.hash(password)
@@ -51,3 +52,20 @@ def get_current_user(request: Request, db):
     if user is None:
         raise credentials_exception
     return user
+
+def create_reset_token(email: str):
+    expire = datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
+    to_encode = {"sub": email, "purpose": "reset", "exp": expire}
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verify_reset_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        purpose: str = payload.get("purpose")
+        if email is None or purpose != "reset":
+            raise Exception("Invalid reset token")
+        return email
+    except JWTError:
+        raise Exception("Invalid reset token")
