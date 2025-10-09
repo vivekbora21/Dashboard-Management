@@ -97,7 +97,7 @@ const Dashboard = () => {
   { icon: "💰", title: "Total Sales", value: `₹ ${(stats.totalSales || 0).toLocaleString('en-IN')}` },
   { icon: "📈", title: "Total Profit", value: `₹ ${(stats.totalProfit || 0).toLocaleString('en-IN')}` },
   { icon: "📊", title: "Profit Margin", value: `${(stats.profitMargin || 0).toFixed(2)}%` },
-  { icon: "📉", title: "Revenue Growth", value: `${(stats.revenueGrowth || 0).toFixed(1)}%` },
+  { icon: "💹", title: "Revenue Growth", value: `${(stats.revenueGrowth || 0).toFixed(1)}%` },
   { icon: "📊", title: "Total Quantity", value: `${(stats.totalQuantity || 0).toLocaleString('en-IN')}` },
   { icon: "⭐", title: "Average Rating", value: `${(stats.avgRating || 0).toFixed(1)}/5` },
   { icon: "🛒", title: "Average Order Value", value: `₹ ${(stats.avgOrderValue || 0).toLocaleString('en-IN')}` },
