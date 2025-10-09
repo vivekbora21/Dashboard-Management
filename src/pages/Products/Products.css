@@ -96,9 +96,9 @@
 }
 
 .modal-content {
-  background-color: white;
+  background-color: rgb(246, 244, 244);
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
@@ -107,9 +107,10 @@
 }
 
 .modal-content h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 30px;
   color: #333;
+  font-weight: 800;
 }
 
 .product-form {
@@ -145,7 +146,7 @@
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
   margin-top: 20px;
 }
@@ -156,31 +157,25 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  background-color: #28a745;
+  color: white;
 }
 
 .cancel-btn {
   padding: 8px 16px;
   border: none;
-  margin-top: 20px;
-  height: 40px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-}
-
-.submit-btn {
-  background-color: #28a745;
+  background-color: #6c757d;
   color: white;
 }
+
 
 .submit-btn:hover {
   background-color: #218838;
 }
 
-.cancel-btn {
-  background-color: #6c757d;
-  color: white;
-}
 
 .cancel-btn:hover {
   background-color: #5a6268;
