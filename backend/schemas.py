@@ -3,6 +3,28 @@ from typing import Optional
 from datetime import date
 import re
 
+def validate_name(value: str, field_name: str) -> str:
+    value = value.strip()
+    if len(value) < 3 or len(value) > 20:
+        raise ValueError(f'{field_name} must be between 3 and 20 characters')
+    if not re.match(r'^[a-zA-Z]+$', value):
+        raise ValueError(f'{field_name} can only contain letters')
+    return value
+
+
+def validate_phone_number(value: str) -> str:
+    if not re.match(r'^\+?[\d\s()-]{10,}$', value):
+        raise ValueError('Please enter a valid phone number')
+    return value
+
+
+def validate_password_strength(value: str) -> str:
+    if len(value) < 8:
+        raise ValueError('Password must be at least 8 characters')
+    if not re.match(r'(?=.*[a-z])(?=.*[A-Z])(?=.*\d)', value):
+        raise ValueError('Password must contain uppercase, lowercase, and at least one number')
+    return value
+
 class UserCreate(BaseModel):
     firstName: str
     lastName: str
@@ -12,46 +34,23 @@ class UserCreate(BaseModel):
     confirmPassword: Optional[str] = None
 
     @field_validator('firstName')
-    @classmethod
-    def validate_first_name(cls, v):
-        v = v.strip()
-        if len(v) < 3 or len(v) > 20:
-            raise ValueError('First name must be at least 3 characters and at most 20 characters')
-        if not re.match(r'^[a-zA-Z]+$', v):
-            raise ValueError('First name can only contain letters')
-        return v
+    def validate_first_name(cls, v): return validate_name(v, "First name")
 
     @field_validator('lastName')
-    @classmethod
-    def validate_last_name(cls, v):
-        v = v.strip()
-        if len(v) < 3 or len(v) > 20:
-            raise ValueError('Last name must be at least 3 characters and at most 20 characters')
-        if not re.match(r'^[a-zA-Z]+$', v):
-            raise ValueError('Last name can only contain letters')
-        return v
+    def validate_last_name(cls, v): return validate_name(v, "Last name")
 
     @field_validator('phone')
-    @classmethod
-    def validate_phone(cls, v):
-        if not re.match(r'^\+?[\d\s()-]{10,}$', v):
-            raise ValueError('Please enter a valid phone number')
-        return v
+    def validate_phone(cls, v): return validate_phone_number(v)
 
     @field_validator('password')
-    @classmethod
-    def validate_password(cls, v):
-        if len(v) < 8:
-            raise ValueError('Password must be at least 8 characters')
-        if not re.match(r'(?=.*[a-z])(?=.*[A-Z])(?=.*\d)', v):
-            raise ValueError('Password must contain at least one uppercase letter, one lowercase letter, and one number')
-        return v
+    def validate_password(cls, v): return validate_password_strength(v)
 
     @model_validator(mode='after')
-    def validate_confirm_password(self):
+    def check_passwords_match(self):
         if self.confirmPassword != self.password:
             raise ValueError('Passwords do not match')
         return self
+
 
 class UserOut(BaseModel):
     id: int
@@ -62,6 +61,7 @@ class UserOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class UserUpdate(BaseModel):
     firstName: str
     lastName: str
@@ -69,39 +69,21 @@ class UserUpdate(BaseModel):
     phone: str
 
     @field_validator('firstName')
-    @classmethod
-    def validate_first_name(cls, v):
-        v = v.strip()
-        if len(v) < 3 or len(v) > 20:
-            raise ValueError('First name must be at least 3 characters and at most 20 characters')
-        if not re.match(r'^[a-zA-Z]+$', v):
-            raise ValueError('First name can only contain letters')
-        return v
+    def validate_first_name(cls, v): return validate_name(v, "First name")
 
     @field_validator('lastName')
-    @classmethod
-    def validate_last_name(cls, v):
-        v = v.strip()
-        if len(v) < 3 or len(v) > 20:
-            raise ValueError('Last name must be at least 3 characters and at most 20 characters')
-        if not re.match(r'^[a-zA-Z]+$', v):
-            raise ValueError('Last name can only contain letters')
-        return v
+    def validate_last_name(cls, v): return validate_name(v, "Last name")
 
     @field_validator('phone')
-    @classmethod
-    def validate_phone(cls, v):
-        if not re.match(r'^\+?[\d\s-()]{10,}$', v):
-            raise ValueError('Please enter a valid phone number')
-        return v
+    def validate_phone(cls, v): return validate_phone_number(v)
+
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
     @field_validator('password')
-    @classmethod
-    def validate_password(cls, v):
+    def password_not_empty(cls, v):
         if not v:
             raise ValueError('Password is required')
         return v
@@ -117,49 +99,31 @@ class ProductCreate(BaseModel):
     discounts: Optional[str] = None
     soldDate: Optional[date] = None
 
-    @field_validator('productName')
-    @classmethod
-    def validate_product_name(cls, v):
+    @field_validator('productName', 'productCategory')
+    def validate_text_fields(cls, v):
         v = v.strip()
         if not v:
-            raise ValueError('Product name is required')
+            raise ValueError('This field is required')
         return v
 
-    @field_validator('productCategory')
-    @classmethod
-    def validate_product_category(cls, v):
-        v = v.strip()
-        if not v:
-            raise ValueError('Product category is required')
-        return v
-
-    @field_validator('productPrice')
-    @classmethod
-    def validate_product_price(cls, v):
+    @field_validator('productPrice', 'sellingPrice')
+    def validate_positive_price(cls, v):
         if v <= 0:
-            raise ValueError('Product price must be greater than 0')
-        return v
-
-    @field_validator('sellingPrice')
-    @classmethod
-    def validate_selling_price(cls, v):
-        if v <= 0:
-            raise ValueError('Selling price must be greater than 0')
+            raise ValueError('Price must be greater than 0')
         return v
 
     @field_validator('quantity')
-    @classmethod
-    def validate_quantity(cls, v):
+    def validate_positive_quantity(cls, v):
         if v <= 0:
             raise ValueError('Quantity must be greater than 0')
         return v
 
     @field_validator('ratings')
-    @classmethod
-    def validate_ratings(cls, v):
+    def validate_rating_range(cls, v):
         if v is not None and (v < 0 or v > 5):
             raise ValueError('Ratings must be between 0 and 5')
         return v
+
 
 class ProductOut(BaseModel):
     id: int
