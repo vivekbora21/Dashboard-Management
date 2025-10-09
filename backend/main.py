@@ -223,6 +223,22 @@ def get_kpi_avg_discount(current_user: models.User = Depends(get_current_user), 
 def get_kpi_top_profit_products(limit: int = 5, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return kpis.get_top_profit_products(db, current_user.id, limit)
 
+@app.get("/kpi/revenue_growth")
+def get_kpi_revenue_growth(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return {"value": kpis.get_revenue_growth(db, current_user.id)}
+
+@app.get("/kpi/profit_margin")
+def get_kpi_profit_margin(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return {"value": kpis.get_profit_margin(db, current_user.id)}
+
+@app.get("/kpi/avg_order_value")
+def get_kpi_avg_order_value(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return {"value": kpis.get_avg_order_value(db, current_user.id)}
+
+@app.get("/kpi/top_category")
+def get_kpi_top_category(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return {"value": kpis.get_top_category(db, current_user.id)}
+
 @app.post("/upload-excel/")
 def upload_excel(
     file: UploadFile = File(...),

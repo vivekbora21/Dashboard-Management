@@ -13,46 +13,62 @@ const Dashboard = () => {
     totalQuantity: 0,
     highestSellingProduct: null,
     highestProfitProduct: null,
-    avgDiscount: 0
+    avgDiscount: 0,
+    revenueGrowth: 0,
+    profitMargin: 0,
+    avgOrderValue: 0,
+    topCategory: null
   });
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   const fetchStats = useCallback(async () => {
-    try {
-      const [
-        totalSalesRes,
-        totalProfitRes,
-        avgRatingRes,
-        totalOrdersRes,
-        totalQuantityRes,
-        highestSellingRes,
-        highestProfitRes,
-        avgDiscountRes
-      ] = await Promise.all([
-        api.get("/kpi/total_sales"),
-        api.get("/kpi/total_profit"),
-        api.get("/kpi/avg_rating"),
-        api.get("/kpi/total_orders"),
-        api.get("/kpi/total_quantity"),
-        api.get("/kpi/highest_selling_product"),
-        api.get("/kpi/highest_profit_product"),
-        api.get("/kpi/avg_discount")
-      ]);
+  try {
+    const [
+      totalSalesRes,
+      totalProfitRes,
+      avgRatingRes,
+      totalOrdersRes,
+      totalQuantityRes,
+      highestSellingRes,
+      highestProfitRes,
+      avgDiscountRes,
+      revenueGrowthRes,
+      profitMarginRes,
+      avgOrderValueRes,
+      topCategoryRes,
+    ] = await Promise.all([
+      api.get("/kpi/total_sales"),
+      api.get("/kpi/total_profit"),
+      api.get("/kpi/avg_rating"),
+      api.get("/kpi/total_orders"),
+      api.get("/kpi/total_quantity"),
+      api.get("/kpi/highest_selling_product"),
+      api.get("/kpi/highest_profit_product"),
+      api.get("/kpi/avg_discount"),
+      api.get("/kpi/revenue_growth"),
+      api.get("/kpi/profit_margin"),
+      api.get("/kpi/avg_order_value"),
+      api.get("/kpi/top_category"),
+    ]);
 
-      setStats({
-        totalSales: totalSalesRes.data.value,
-        totalProfit: totalProfitRes.data.value,
-        avgRating: avgRatingRes.data.value,
-        totalOrders: totalOrdersRes.data.value,
-        totalQuantity: totalQuantityRes.data.value,
-        highestSellingProduct: highestSellingRes.data,
-        highestProfitProduct: highestProfitRes.data,
-        avgDiscount: avgDiscountRes.data.value
-      });
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    }
-  }, []);
+    setStats({
+      totalSales: totalSalesRes.data.value,
+      totalProfit: totalProfitRes.data.value,
+      avgRating: avgRatingRes.data.value,
+      totalOrders: totalOrdersRes.data.value,
+      totalQuantity: totalQuantityRes.data.value,
+      highestSellingProduct: highestSellingRes.data,
+      highestProfitProduct: highestProfitRes.data,
+      avgDiscount: avgDiscountRes.data.value,
+      revenueGrowth: revenueGrowthRes.data.value,
+      profitMargin: profitMarginRes.data.value,
+      avgOrderValue: avgOrderValueRes.data.value,
+      topCategory: topCategoryRes.data.value,
+    });
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+  }
+}, []);
 
   const fetchTopProducts = useCallback(async () => {
     try {
@@ -78,15 +94,20 @@ const Dashboard = () => {
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
 
   const statItems = [
-    { icon: "💰", title: "Total Sales", value: `₹ ${stats.totalSales.toLocaleString('en-IN')}` },
-    { icon: "📈", title: "Total Profit", value: `₹ ${stats.totalProfit.toLocaleString('en-IN')}` },
-    { icon: "📦", title: "Total Orders", value: stats.totalOrders.toLocaleString('en-IN') },
-    { icon: "⭐", title: "Average Rating", value: `${stats.avgRating.toFixed(1)}/5` },
-    { icon: "🛒", title: "Total Quantity Sold", value: stats.totalQuantity.toLocaleString('en-IN') },
-    { icon: "🏆", title: "Top Profit Product", value: stats.highestProfitProduct?.productName || "N/A" },
-    { icon: "🔥", title: "Top Selling Product", value: stats.highestSellingProduct?.productName || "N/A" },
-    { icon: "💸", title: "Avg Discount Given", value: `₹ ${stats.avgDiscount.toLocaleString('en-IN')}` },
-  ];
+  { icon: "💰", title: "Total Sales", value: `₹ ${(stats.totalSales || 0).toLocaleString('en-IN')}` },
+  { icon: "📈", title: "Total Profit", value: `₹ ${(stats.totalProfit || 0).toLocaleString('en-IN')}` },
+  { icon: "📊", title: "Profit Margin", value: `${(stats.profitMargin || 0).toFixed(2)}%` },
+  { icon: "📉", title: "Revenue Growth", value: `${(stats.revenueGrowth || 0).toFixed(1)}%` },
+  { icon: "📊", title: "Total Quantity", value: `${(stats.totalQuantity || 0).toLocaleString('en-IN')}` },
+  { icon: "⭐", title: "Average Rating", value: `${(stats.avgRating || 0).toFixed(1)}/5` },
+  { icon: "🛒", title: "Average Order Value", value: `₹ ${(stats.avgOrderValue || 0).toLocaleString('en-IN')}` },
+  { icon: "🏬", title: "Top Category", value: stats.topCategory || "N/A" },
+  { icon: "💸", title: "Avg Discount Given", value: `₹ ${(stats.avgDiscount || 0).toLocaleString('en-IN')}` },
+  { icon: "🔥", title: "Top Selling Product", value: stats.highestSellingProduct?.productName || "N/A" },
+  { icon: "📦", title: "Total Orders", value: `${(stats.totalOrders || 0).toLocaleString('en-IN')}` },
+  { icon: "🏆", title: "Top Profit Product", value: stats.highestProfitProduct?.productName || "N/A" },
+];
+
 
   return (
     <div className="dashboard-page">
