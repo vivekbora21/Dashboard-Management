@@ -27,3 +27,13 @@ def validate_update_user(db: Session, user_id: int, user):
         existing_user = db.query(models.User).filter(models.User.email == user.email).first()
         if existing_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already in use")
+
+def validate_add_product(product):
+    if product.productPrice <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Product price must be greater than 0")
+    if product.sellingPrice < product.productPrice:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Selling price must be greater than or equal to product price")
+    if product.quantity <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Quantity must be greater than 0")
+    if product.ratings is not None and (product.ratings < 0 or product.ratings > 5):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ratings must be between 0 and 5")

@@ -99,6 +99,7 @@ def login(user: schemas.UserLogin, response: Response, db: Session = Depends(get
 # Manual Product Update
 @app.post("/manual-update/", response_model=schemas.ProductOut, status_code=status.HTTP_201_CREATED)
 def manual_update(product: schemas.ProductCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    validation.validate_add_product(product)
     try:
         product_dict = product.dict()
         product_dict['userId'] = current_user.id
