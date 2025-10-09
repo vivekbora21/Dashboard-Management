@@ -3,38 +3,30 @@ from sqlalchemy import func, case
 import models
 from datetime import datetime, timedelta
 
-
-# ---------------------- EXISTING KPIs ----------------------
-
 def get_total_sales(db: Session, user_id: int):
     result = db.query(func.sum(models.Product.sellingPrice * models.Product.quantity))\
         .filter(models.Product.userId == user_id).scalar()
     return float(result or 0)
-
 
 def get_total_profit(db: Session, user_id: int):
     result = db.query(func.sum((models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity))\
         .filter(models.Product.userId == user_id).scalar()
     return float(result or 0)
 
-
 def get_avg_rating(db: Session, user_id: int):
     result = db.query(func.avg(models.Product.ratings))\
         .filter(models.Product.userId == user_id, models.Product.ratings != None).scalar()
     return float(result or 0)
-
 
 def get_total_orders(db: Session, user_id: int):
     result = db.query(func.count(models.Product.id))\
         .filter(models.Product.userId == user_id).scalar()
     return int(result or 0)
 
-
 def get_total_quantity(db: Session, user_id: int):
     result = db.query(func.sum(models.Product.quantity))\
         .filter(models.Product.userId == user_id).scalar()
     return int(result or 0)
-
 
 def get_highest_selling_product(db: Session, user_id: int):
     product = db.query(models.Product)\
@@ -45,7 +37,6 @@ def get_highest_selling_product(db: Session, user_id: int):
         return {"id": product.id, "productName": product.productName}
     return None
 
-
 def get_highest_profit_product(db: Session, user_id: int):
     product = db.query(models.Product)\
         .filter(models.Product.userId == user_id)\
@@ -55,9 +46,7 @@ def get_highest_profit_product(db: Session, user_id: int):
         return {"id": product.id, "productName": product.productName}
     return None
 
-
 def get_avg_discount(db: Session, user_id: int):
-    # discounts is stored as string, convert to float before averaging
     discounts = db.query(models.Product.discounts)\
         .filter(models.Product.userId == user_id, models.Product.discounts != None).all()
     discount_values = []
@@ -96,12 +85,10 @@ def get_profit_margin(db: Session, user_id: int):
     total_profit = get_total_profit(db, user_id)
     return round((total_profit / total_sales) * 100, 2) if total_sales else 0.0
 
-
 def get_avg_order_value(db: Session, user_id: int):
     total_sales = get_total_sales(db, user_id)
     total_orders = get_total_orders(db, user_id)
     return round(total_sales / total_orders, 2) if total_orders else 0.0
-
 
 def get_top_category(db: Session, user_id: int):
     result = db.query(
@@ -114,10 +101,8 @@ def get_top_category(db: Session, user_id: int):
 
     return result.productCategory if result else None
 
-
 def get_revenue_growth(db: Session, user_id: int):
     """Example: Compare last month’s total sales with the previous month’s."""
-
     today = datetime.utcnow().date()
     start_of_this_month = today.replace(day=1)
     start_of_last_month = (start_of_this_month - timedelta(days=1)).replace(day=1)
