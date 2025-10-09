@@ -13,8 +13,29 @@ const Statistics = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await api.get("/statistics/");
-        setStats(response.data);
+        const [
+          salesTrendRes,
+          dailySalesRes,
+          profitPerProductRes,
+          topProductsRes,
+          profitPerCategoryRes,
+          avgRatingsRes
+        ] = await Promise.all([
+          api.get("/statistics/sales-trend"),
+          api.get("/statistics/daily-sales"),
+          api.get("/statistics/profit-per-product"),
+          api.get("/statistics/top-products"),
+          api.get("/statistics/profit-per-category"),
+          api.get("/statistics/avg-ratings")
+        ]);
+        setStats({
+          sales_trend: salesTrendRes.data,
+          daily_sales: dailySalesRes.data,
+          profit_per_product: profitPerProductRes.data,
+          top_products: topProductsRes.data,
+          profit_per_category: profitPerCategoryRes.data,
+          avg_ratings: avgRatingsRes.data
+        });
       } catch (error) {
         console.error("Error fetching statistics:", error);
       }

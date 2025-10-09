@@ -7,8 +7,8 @@ from auth import get_current_user
 
 router = APIRouter(prefix="/statistics", tags=["Statistics"])
 
-@router.get("/")
-def get_user_statistics(request: Request, db: Session = Depends(get_db)):
+@router.get("/sales-trend")
+def get_sales_trend(request: Request, db: Session = Depends(get_db)):
     try:
         user = get_current_user(request, db)
     except Exception:
@@ -31,6 +31,15 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
     sales_trend_data = [
         {"month": m, "sales": float(s or 0), "profit": float(p or 0)} for m, s, p in sales_trend
     ]
+    return sales_trend_data
+
+@router.get("/category-distribution")
+def get_category_distribution(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+
     category_distribution = (
         db.query(
             models.Product.productCategory,
@@ -43,6 +52,14 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
     category_distribution_data = [
         {"category": c, "value": float(t or 0)} for c, t in category_distribution
     ]
+    return category_distribution_data
+
+@router.get("/avg-ratings")
+def get_avg_ratings(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
 
     avg_ratings = (
         db.query(
@@ -56,6 +73,14 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
     avg_ratings_data = [
         {"productCategory": c, "avg_rating": round(r, 2) if r else 0} for c, r in avg_ratings
     ]
+    return avg_ratings_data
+
+@router.get("/profit-per-category")
+def get_profit_per_category(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
 
     profit_per_category = (
         db.query(
@@ -71,6 +96,14 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
     profit_per_category_data = [
         {"productCategory": c, "profit": float(p or 0)} for c, p in profit_per_category
     ]
+    return profit_per_category_data
+
+@router.get("/top-products")
+def get_top_products(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
 
     top_products = (
         db.query(models.Product.productName, func.sum(models.Product.quantity).label("total_sold"))
@@ -83,6 +116,33 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
     top_products_data = [
         {"productName": n.capitalize() if n else n, "quantity": int(q or 0)} for n, q in top_products
     ]
+    return top_products_data
+
+@router.get("/daily-sales")
+def get_daily_sales(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+
+    daily_sales = (
+        db.query(models.Product.soldDate, func.sum(models.Product.quantity).label("total"))
+        .filter(models.Product.userId == user.id)
+        .group_by(models.Product.soldDate)
+        .order_by(models.Product.soldDate)
+        .all()
+    )
+    daily_sales_data = [
+        {"soldDate": str(d), "quantity": int(q or 0)} for d, q in daily_sales
+    ]
+    return daily_sales_data
+
+@router.get("/profit-per-product")
+def get_profit_per_product(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
 
     profit_per_product = (
         db.query(
@@ -97,25 +157,5 @@ def get_user_statistics(request: Request, db: Session = Depends(get_db)):
 
     profit_per_product_data = [
         {"productName": name.capitalize() if name else name, "profit": float(profit or 0)} for name, profit in profit_per_product
-        ]
-
-    daily_sales = (
-        db.query(models.Product.soldDate, func.sum(models.Product.quantity).label("total"))
-        .filter(models.Product.userId == user.id)
-        .group_by(models.Product.soldDate)
-        .order_by(models.Product.soldDate)
-        .all()
-    )
-    daily_sales_data = [
-        {"soldDate": str(d), "quantity": int(q or 0)} for d, q in daily_sales
     ]
-
-    return {
-        "sales_trend": sales_trend_data,
-        "category_distribution": category_distribution_data,
-        "avg_ratings": avg_ratings_data,
-        "profit_per_category": profit_per_category_data,
-        "top_products": top_products_data,
-        "daily_sales": daily_sales_data,
-        "profit_per_product": profit_per_product_data,
-    }
+    return profit_per_product_data
