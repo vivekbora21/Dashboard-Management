@@ -113,7 +113,7 @@ const Products = () => {
 
   return (
     <div className="products-container">
-      <h1><FaList/>  Products Management</h1>
+      <h1><FaList/>  Products</h1>
       <table className="products-table">
         <thead>
           <tr>

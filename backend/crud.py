@@ -203,3 +203,50 @@ def get_products_paginated(db: Session, user_id: int, page: int = 1, limit: int 
     products = db.query(models.Product).filter(models.Product.userId == user_id).order_by(models.Product.soldDate.desc()).offset(offset).limit(limit).all()
     total = db.query(models.Product).filter(models.Product.userId == user_id).count()
     return products, total
+
+def get_all_plans(db: Session):
+    return db.query(models.Plan).all()
+
+def update_user_plan(db: Session, user_id: int, plan_id: int):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        return None
+    db_plan = db.query(models.Plan).filter(models.Plan.id == plan_id).first()
+    if not db_plan:
+        return None
+    db_user.plan_id = plan_id
+    db_user.plan_expiry = datetime.now() + timedelta(days=30)
+    db.commit()
+    db.refresh(db_user)
+    # Create subscription record
+    create_subscription(db, user_id, plan_id, db_user.plan_expiry)
+    return db_user
+
+def get_user_current_plan(db: Session, user_id: int):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user or not db_user.plan_id or not db_user.plan_expiry or db_user.plan_expiry < datetime.now():
+        return None
+    plan = db.query(models.Plan).filter(models.Plan.id == db_user.plan_id).first()
+    if not plan:
+        return None
+    return {
+        "id": plan.id,
+        "name": plan.name,
+        "price": plan.price,
+        "description": plan.description,
+        "features": plan.features,
+        "expiry": db_user.plan_expiry
+    }
+
+def create_subscription(db: Session, user_id: int, plan_id: int, end_date: datetime = None):
+    db_subscription = models.Subscription(
+        user_id=user_id,
+        plan_id=plan_id,
+        start_date=datetime.now(),
+        end_date=end_date,
+        status="active"
+    )
+    db.add(db_subscription)
+    db.commit()
+    db.refresh(db_subscription)
+    return db_subscription

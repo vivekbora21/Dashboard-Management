@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, field_validator, model_validator, ConfigDict
 from typing import Optional
-from datetime import date
+from datetime import date,datetime      
 import re
 
 def validate_name(value: str, field_name: str) -> str:
@@ -136,5 +136,24 @@ class ProductOut(BaseModel):
     ratings: Optional[float] = None
     discounts: Optional[str] = None
     soldDate: Optional[date] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+class PlanOut(BaseModel):
+    id: int
+    name: str
+    price: float
+    description: Optional[str] = None
+    features: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+class UserPlanOut(BaseModel):
+    id: int
+    name: str
+    price: float
+    description: Optional[str] = None
+    features: Optional[str] = None
+    expiry: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)

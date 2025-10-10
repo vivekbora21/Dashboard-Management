@@ -15,12 +15,14 @@ import crud
 from database import engine, get_db
 from utils import parse_date
 from statistics import router as statistics_router
+from routers.plans_router import router as plans_router
 import kpis
 import validation
 import os
 
 app = FastAPI()
 app.include_router(statistics_router)
+app.include_router(plans_router)
 models.Base.metadata.create_all(bind=engine)
 MAX_ROWS = 10
 

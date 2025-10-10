@@ -19,7 +19,7 @@ const SidebarLayout = () => {
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
-        <h6 className="logo">DashBoardManager</h6>
+        <h6 className="logo">ProductManager</h6>
         <nav>
           <ul>
             <li className={location.pathname === "/dashboard" ? "active" : ""}><Link to="/dashboard">Dashboard</Link></li>
@@ -27,6 +27,7 @@ const SidebarLayout = () => {
             <li className={location.pathname === "/dashboard/statistics" ? "active" : ""}><Link to="/dashboard/statistics">Statistic</Link></li>
             <li className={location.pathname === "/dashboard/products" ? "active" : ""}><Link to="/dashboard/products">Product</Link></li>
             <li className={location.pathname === "/dashboard/profile" ? "active" : ""}><Link to="/dashboard/profile">Profile</Link></li>
+            <li className={location.pathname === "/dashboard/plans" ? "active" : ""}><Link to="/dashboard/plans">Plans</Link></li>
           </ul>
         </nav>
         <div className="logout-section">

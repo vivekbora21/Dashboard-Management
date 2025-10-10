@@ -17,6 +17,7 @@ const SidebarLayout = lazy(() => import('./layouts/SidebarLayout/SidebarLayout')
 const Products = lazy(() => import('./pages/Products/Products'));
 const Profile = lazy(() => import('./pages/Profile/Profile'));
 const Statistics = lazy(() => import('./pages/Statistics/Statistics'));
+const Plans = lazy(() => import('./pages/Plans/Plans'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
             <Route path="products" element={<Products />} />
             <Route path="profile" element={<Profile />} />
             <Route path="statistics" element={<Statistics />} />
+            <Route path="plans" element={<Plans />} />
           </Route>
         </Routes>
       </Suspense>
