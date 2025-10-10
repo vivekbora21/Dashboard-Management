@@ -151,7 +151,7 @@
   margin-top: 20px;
 }
 
-.submit-btn {
+.upd-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -161,7 +161,7 @@
   color: white;
 }
 
-.cancel-btn {
+.cncl-btn-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -172,12 +172,12 @@
 }
 
 
-.submit-btn:hover {
+.upd-btn:hover {
   background-color: #218838;
 }
 
 
-.cancel-btn:hover {
+.cncl-btn-btn:hover {
   background-color: #5a6268;
 }
 

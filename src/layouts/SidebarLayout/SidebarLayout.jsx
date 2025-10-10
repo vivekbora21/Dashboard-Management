@@ -19,7 +19,7 @@ const SidebarLayout = () => {
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
-        <h6 className="logo">ProductManager</h6>
+        <h6 className="logo">SalesManager</h6>
         <nav>
           <ul>
             <li className={location.pathname === "/dashboard" ? "active" : ""}><Link to="/dashboard">Dashboard</Link></li>

@@ -120,7 +120,7 @@ const Login = ({ onSwitchToSignup }) => {
       </form>
 
       <div className="login-switch-auth">
-        <p>Don't have an account? <span className="login-link" onClick={() => navigate("/signup")}>Sign Up</span></p>
+        <p>Don't have an account? <span className="login-link" onClick={() => navigate("/signup")}>Register</span></p>
       </div>
     </div>
   )

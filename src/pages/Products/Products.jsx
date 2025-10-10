@@ -219,8 +219,8 @@ const Products = () => {
                 <input type="date" name="soldDate" value={formData.soldDate} onChange={handleFormChange} />
               </div>
               <div className="form-actions">
-                <button type="submit" className="submit-btn">Update Product</button>
-                <button type="button" className="cancel-btn" onClick={closeModal}>Cancel</button>
+                <button type="submit" className="upd-btn">Update Product</button>
+                <button type="button" className="cncl-btn" onClick={closeModal}>Cancel</button>
               </div>
             </form>
           </div>

@@ -5,6 +5,7 @@ from models import User
 from schemas import UserCreate, UserLogin, User
 from auth import hash_password, create_access_token, get_token_from_cookie, verify_token
 from validation import validate_signup, validate_login
+import crud
 
 router = APIRouter()
 
@@ -53,11 +54,13 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
 
 @router.get("/user/profile")
 def get_user_profile(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    current_plan = crud.get_user_current_plan(db, current_user.id)
     return {
         "firstName": current_user.firstName,
         "lastName": current_user.lastName,
         "email": current_user.email,
-        "phone": current_user.phone
+        "phone": current_user.phone,
+        "currentPlan": current_plan
     }
 
 @router.put("/user/profile")
