@@ -11,8 +11,6 @@ class Plan(Base):
     price = Column(Float, default=0.0)
     description = Column(Text, nullable=True)
     features = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class User(Base):
     __tablename__ = "users"
@@ -42,8 +40,6 @@ class Product(Base):
     soldDate = Column(Date, nullable=True)
 
     user = relationship("User", back_populates="products")
-
-
 
 class OTP(Base):
     __tablename__ = "otps"

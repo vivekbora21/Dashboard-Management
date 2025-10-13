@@ -206,7 +206,7 @@ const AddProduct = () => {
           <div className="instructions">
             <h4>How to Upload Products:</h4>
             <ol>
-              <li>Download the sample Excel file using the link below.</li>
+              <li>Download the sample Excel file using the <a href="/Sample.xlsx">link</a> below.</li>
               <li>Open the file and fill in details for up to 10 products. Do not exceed 10 products.</li>
               <li>Save the file and select it using the file input below.</li>
               <li>Click the "Upload" button to submit your products.</li>
@@ -225,7 +225,7 @@ const AddProduct = () => {
           </div>
           <p>
             <a href="/Sample.xlsx" download className="download-link">
-              ⬇ Download Sample Excel
+              Download Excel File
             </a>
           </p>
         </section>

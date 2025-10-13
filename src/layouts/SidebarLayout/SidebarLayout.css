@@ -20,8 +20,13 @@
   left: 0;
   height: 100vh;
   z-index: 1000;
-  transition: transform 0.3s ease;
+  transition: width 0.3s ease, transform 0.3s ease;
   border: 1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar.collapsed {
+  width: 80px;
+  padding: 30px 10px;
 }
 
 .sidebar::before {
@@ -34,6 +39,19 @@
   background: linear-gradient(90deg, #667eea, #764ba2);
 }
 
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.sidebar_name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-left: 10px;
+}
 .logo {
   font-size: 1.4rem;
   font-weight: 800;
@@ -42,8 +60,22 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-align: center;
-  margin-bottom: 40px;
   cursor: pointer;
+  flex: 1;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #4a5568;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: rgba(102, 126, 234, 0.1);
 }
 
 .sidebar ul {
@@ -66,6 +98,17 @@
   border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
+.sidebar.collapsed li {
+  justify-content: center;
+  padding: 12px;
+  transform: none;
+}
+
+.sidebar.collapsed li:hover,
+.sidebar.collapsed li.active {
+  transform: none;
+}
+
 .sidebar li:hover,
 .sidebar li.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -75,8 +118,17 @@
 }
 
 .sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   text-decoration: none;
   color: inherit;
+  width: 100%;
+}
+
+.sidebar.collapsed a {
+  justify-content: center;
+  gap: 0;
 }
 
 /* ============ MAIN CONTENT ============ */
@@ -88,6 +140,11 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.collapsed {
+  margin-left: 60px;
 }
 
 /* ============ LOGOUT SECTION ============ */

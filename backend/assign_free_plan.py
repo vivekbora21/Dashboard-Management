@@ -6,17 +6,14 @@ from crud import create_subscription
 def assign_free_plan_to_existing_users():
     db = SessionLocal()
     try:
-        # Get all users
         users = db.query(models.User).all()
         for user in users:
-            # Check if user already has an active subscription
             existing_subscription = db.query(models.Subscription).filter(
                 models.Subscription.user_id == user.id,
                 models.Subscription.status == "active"
             ).first()
             if not existing_subscription:
-                # Assign free plan via subscription
-                create_subscription(db, user.id, 1)  # Free plan id=1
+                create_subscription(db, user.id, 1)
         db.commit()
         print("Free plans assigned to existing users via subscriptions.")
     except Exception as e:

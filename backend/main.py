@@ -75,6 +75,7 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    crud.create_subscription(db, new_user.id, 1)
 
 #Login
 @app.post("/login/")

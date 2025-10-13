@@ -59,7 +59,7 @@ const Plans = () => {
         {currentPlan && (
           <div className="current-plan-display">
             <h3>Your Current Plan: {currentPlan.name}</h3>
-            <p>Expires on: {new Date(currentPlan.expiry).toLocaleDateString()}</p>
+            <p>Expires on: {currentPlan.expiry ? new Date(currentPlan.expiry).toLocaleDateString() : "infinite"}</p>
           </div>
         )}
 

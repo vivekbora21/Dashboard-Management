@@ -216,13 +216,12 @@ def update_user_plan(db: Session, user_id: int, plan_id: int):
     db_plan = db.query(models.Plan).filter(models.Plan.id == plan_id).first()
     if not db_plan:
         return None
-    # Create subscription record with 30-day expiry
     end_date = datetime.now() + timedelta(days=30)
+    upt_subscription = update_subscription(db, user_id, plan_id, end_date)
     subscription = create_subscription(db, user_id, plan_id, end_date)
     return subscription
 
 def get_user_current_plan(db: Session, user_id: int):
-    # Get the most recent active subscription for the user
     db_subscription = db.query(models.Subscription).filter(
         models.Subscription.user_id == user_id,
         models.Subscription.status == "active"
@@ -256,3 +255,15 @@ def create_subscription(db: Session, user_id: int, plan_id: int, end_date: datet
     db.commit()
     db.refresh(db_subscription)
     return db_subscription
+
+def update_subscription(db: Session, user_id: int, plan_id: int, end_date: datetime):
+    db_subscription = db.query(models.Subscription).filter(
+        models.Subscription.user_id == user_id,
+        models.Subscription.status == "active"
+    ).first()
+    if db_subscription:
+        db_subscription.status = None
+        db.commit()
+        db.refresh(db_subscription)
+        return db_subscription
+    return None
