@@ -3,6 +3,7 @@ import api from "../../api";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Signup.css';
+import Loading from '../../components/Loading';
 
 const Signup = () => {
   const inputRef = useRef(null)
@@ -13,6 +14,7 @@ const Signup = () => {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   const validateField = (name, value) => {
     let error = "";
@@ -115,6 +117,7 @@ const Signup = () => {
     e.preventDefault();
 
     if (validateForm()) {
+      setSubmitting(true);
       try {
       const payload = { ...formData };
       const response = await api.post("/signup/", payload);
@@ -135,6 +138,8 @@ const Signup = () => {
       } catch (error) {
         console.log(error.response?.data);
         toast.error("Error during signup: " + (error.response?.data?.detail || error.message));
+      } finally {
+        setSubmitting(false);
       }
     }
   };
@@ -201,7 +206,9 @@ const Signup = () => {
           </div>
         </div>
 
-        <button type="submit" className="signup-signup-btn" disabled={Object.values(errors).some(error => error)}>Sign Up</button>
+        <button type="submit" className="signup-signup-btn" disabled={Object.values(errors).some(error => error) || submitting}>
+          {submitting ? <Loading size={20} /> : 'Sign Up'}
+        </button>
       </form>
 
       <div className="signup-switch-auth">

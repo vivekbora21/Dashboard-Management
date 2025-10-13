@@ -4,11 +4,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import './SidebarLayout.css';
+import Loading from '../../components/Loading';
 
 const SidebarLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, loggingOut } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -31,7 +32,9 @@ const SidebarLayout = () => {
           </ul>
         </nav>
         <div className="logout-section">
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
+          <button onClick={handleLogout} className="logout-btn" disabled={loggingOut}>
+            {loggingOut ? <Loading size={20} /> : 'Logout'}
+          </button>
         </div>
       </aside>
 

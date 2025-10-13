@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api';
+import Loading from '../components/Loading';
 
 const AuthContext = createContext();
 
@@ -15,6 +16,8 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     checkAuthStatus();
@@ -34,11 +37,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
+    setLoggingIn(true);
+    try {
+      setUser(userData);
+      setIsAuthenticated(true);
+    } finally {
+      setLoggingIn(false);
+    }
   };
 
   const logout = async () => {
+    setLoggingOut(true);
     try {
       await api.post('/logout/');
     } catch (error) {
@@ -46,11 +55,12 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsAuthenticated(false);
       setUser(null);
+      setLoggingOut(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, loggingIn, loggingOut, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

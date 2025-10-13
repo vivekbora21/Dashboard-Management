@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api.js";
 import "./AddProduct.css";
 import { MdDriveFolderUpload } from 'react-icons/md';
+import Loading from "../../components/Loading";
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [showManualForm, setShowManualForm] = useState(false);
   const [showUploadControls, setShowUploadControls] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
 
   const [formData, setFormData] = useState({
@@ -80,6 +83,7 @@ const AddProduct = () => {
   const handleFileUpload = async () => {
     if (!selectedFile) return toast.error("Please select a file first");
 
+    setUploading(true);
     const fd = new FormData();
     fd.append("file", selectedFile);
 
@@ -97,6 +101,8 @@ const AddProduct = () => {
       } else {
         toast.error("Network error: Failed to upload");
       }
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -117,6 +123,7 @@ const AddProduct = () => {
   const handleManualSubmit = async (e) => {
     e.preventDefault();
 
+    setSubmitting(true);
     const dataToSend = {
       productName: formData.productName,
       productCategory: formData.productCategory,
@@ -147,6 +154,8 @@ const AddProduct = () => {
       } else {
         toast.error("Network error: Failed to add product");
       }
+    } finally {
+      setSubmitting(false);
     }
     setFormData({
       productName: "",
@@ -210,8 +219,8 @@ const AddProduct = () => {
               onChange={handleFileChange}
               className="file-input"
             />
-            <button onClick={handleFileUpload} className="primary-btn">
-              Upload
+            <button onClick={handleFileUpload} className="primary-btn" disabled={uploading}>
+              {uploading ? <Loading size={20} /> : "Upload"}
             </button>
           </div>
           <p>
@@ -276,7 +285,9 @@ const AddProduct = () => {
               <label htmlFor="soldDate">Sold Date</label>
               <input type="date" id="soldDate" name="soldDate" value={formData.soldDate} onChange={handleChange} className="form-input" />
             </div>
-            <button type="submit" className="submit-btn" disabled={Object.values(errors).some(error => error)}>Save Product</button>
+            <button type="submit" className="submit-btn" disabled={Object.values(errors).some(error => error) || submitting}>
+              {submitting ? <Loading size={20} /> : "Save Product"}
+            </button>
           </form>
         </section>
       )}

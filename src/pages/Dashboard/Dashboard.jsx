@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import api from '../../api';
 import './Dashboard.css';
 import StatCard from "../../components/StatCard.jsx";
+import Loading from "../../components/Loading";
 
 const Dashboard = () => {
   const [products, setProducts] = useState([]);
@@ -20,62 +21,70 @@ const Dashboard = () => {
     topCategory: null
   });
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
   const fetchStats = useCallback(async () => {
-  try {
-    const [
-      totalSalesRes,
-      totalProfitRes,
-      avgRatingRes,
-      totalOrdersRes,
-      totalQuantityRes,
-      highestSellingRes,
-      highestProfitRes,
-      avgDiscountRes,
-      revenueGrowthRes,
-      profitMarginRes,
-      avgOrderValueRes,
-      topCategoryRes,
-    ] = await Promise.all([
-      api.get("/kpi/total_sales"),
-      api.get("/kpi/total_profit"),
-      api.get("/kpi/avg_rating"),
-      api.get("/kpi/total_orders"),
-      api.get("/kpi/total_quantity"),
-      api.get("/kpi/highest_selling_product"),
-      api.get("/kpi/highest_profit_product"),
-      api.get("/kpi/avg_discount"),
-      api.get("/kpi/revenue_growth"),
-      api.get("/kpi/profit_margin"),
-      api.get("/kpi/avg_order_value"),
-      api.get("/kpi/top_category"),
-    ]);
+    setLoadingStats(true);
+    try {
+      const [
+        totalSalesRes,
+        totalProfitRes,
+        avgRatingRes,
+        totalOrdersRes,
+        totalQuantityRes,
+        highestSellingRes,
+        highestProfitRes,
+        avgDiscountRes,
+        revenueGrowthRes,
+        profitMarginRes,
+        avgOrderValueRes,
+        topCategoryRes,
+      ] = await Promise.all([
+        api.get("/kpi/total_sales"),
+        api.get("/kpi/total_profit"),
+        api.get("/kpi/avg_rating"),
+        api.get("/kpi/total_orders"),
+        api.get("/kpi/total_quantity"),
+        api.get("/kpi/highest_selling_product"),
+        api.get("/kpi/highest_profit_product"),
+        api.get("/kpi/avg_discount"),
+        api.get("/kpi/revenue_growth"),
+        api.get("/kpi/profit_margin"),
+        api.get("/kpi/avg_order_value"),
+        api.get("/kpi/top_category"),
+      ]);
 
-    setStats({
-      totalSales: totalSalesRes.data.value,
-      totalProfit: totalProfitRes.data.value,
-      avgRating: avgRatingRes.data.value,
-      totalOrders: totalOrdersRes.data.value,
-      totalQuantity: totalQuantityRes.data.value,
-      highestSellingProduct: highestSellingRes.data,
-      highestProfitProduct: highestProfitRes.data,
-      avgDiscount: avgDiscountRes.data.value,
-      revenueGrowth: revenueGrowthRes.data.value,
-      profitMargin: profitMarginRes.data.value,
-      avgOrderValue: avgOrderValueRes.data.value,
-      topCategory: topCategoryRes.data.value,
-    });
-  } catch (error) {
-    console.error("Error fetching stats:", error);
-  }
-}, []);
+      setStats({
+        totalSales: totalSalesRes.data.value,
+        totalProfit: totalProfitRes.data.value,
+        avgRating: avgRatingRes.data.value,
+        totalOrders: totalOrdersRes.data.value,
+        totalQuantity: totalQuantityRes.data.value,
+        highestSellingProduct: highestSellingRes.data,
+        highestProfitProduct: highestProfitRes.data,
+        avgDiscount: avgDiscountRes.data.value,
+        revenueGrowth: revenueGrowthRes.data.value,
+        profitMargin: profitMarginRes.data.value,
+        avgOrderValue: avgOrderValueRes.data.value,
+        topCategory: topCategoryRes.data.value,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    } finally {
+      setLoadingStats(false);
+    }
+  }, []);
 
   const fetchTopProducts = useCallback(async () => {
+    setLoadingProducts(true);
     try {
       const productsResponse = await api.get("/kpi/top_profit_products", { params: { limit: 5 } });
       setProducts(productsResponse.data);
     } catch (error) {
       console.error("Error fetching products:", error);
+    } finally {
+      setLoadingProducts(false);
     }
   }, []);
 
@@ -117,9 +126,15 @@ const Dashboard = () => {
       </div>
 
       <section className="stats-grid">
-        {statItems.map((item, index) => (
-          <StatCard key={index} icon={item.icon} title={item.title} value={item.value.charAt(0).toUpperCase() + item.value.slice(1)} />
-        ))}
+        {loadingStats ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <Loading size={50} />
+          </div>
+        ) : (
+          statItems.map((item, index) => (
+            <StatCard key={index} icon={item.icon} title={item.title} value={item.value.charAt(0).toUpperCase() + item.value.slice(1)} />
+          ))
+        )}
       </section>
 
       <section className="products-table">
@@ -140,18 +155,26 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((p) => (
-              <tr key={p.id}>
-                <td>{p.productName.charAt(0).toUpperCase() + p.productName.slice(1)}</td>
-                <td>{p.productCategory}</td>
-                <td>{p.productPrice.toLocaleString('en-IN')} ₹</td>
-                <td>{p.quantity}</td>
-                <td>{p.sellingPrice.toLocaleString('en-IN')} ₹</td>
-                <td>{p.ratings}</td>
-                <td>{p.soldDate}</td>
-                <td>{p.profit.toLocaleString('en-IN')} ₹</td>
+            {loadingProducts ? (
+              <tr>
+                <td colSpan="8" style={{ textAlign: 'center', padding: '20px' }}>
+                  <Loading size={30} />
+                </td>
               </tr>
-            ))}
+            ) : (
+              products.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.productName.charAt(0).toUpperCase() + p.productName.slice(1)}</td>
+                  <td>{p.productCategory}</td>
+                  <td>{p.productPrice.toLocaleString('en-IN')} ₹</td>
+                  <td>{p.quantity}</td>
+                  <td>{p.sellingPrice.toLocaleString('en-IN')} ₹</td>
+                  <td>{p.ratings}</td>
+                  <td>{p.soldDate}</td>
+                  <td>{p.profit.toLocaleString('en-IN')} ₹</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>

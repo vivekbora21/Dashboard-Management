@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../contexts/AuthContext';
 import './Login.css';
+import Loading from '../../components/Loading';
 
 const Login = () => {
   const [formData, setFormData] = useState({email: '',password: ''})
@@ -11,6 +12,7 @@ const Login = () => {
   const { login } = useAuth();
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
+  const [submitting, setSubmitting] = useState(false)
 
   const validateField = (name, value) => {
     let error = ''
@@ -68,6 +70,7 @@ const Login = () => {
     e.preventDefault();
 
     if (validateForm()) {
+      setSubmitting(true);
       try {
         const response = await api.post("/login/", formData);
 
@@ -85,6 +88,8 @@ const Login = () => {
       } catch (error) {
         console.error(error.response?.data);
         toast.error(error.response?.data?.detail || "Login failed");
+      } finally {
+        setSubmitting(false);
       }
     }
   };
@@ -116,7 +121,9 @@ const Login = () => {
         </div>
 
 
-        <button type="submit" className="login-login-btn" disabled={Object.values(errors).some(error => error)}>Login</button>
+        <button type="submit" className="login-login-btn" disabled={Object.values(errors).some(error => error) || submitting}>
+          {submitting ? <Loading size={20} /> : 'Login'}
+        </button>
       </form>
 
       <div className="login-switch-auth">
