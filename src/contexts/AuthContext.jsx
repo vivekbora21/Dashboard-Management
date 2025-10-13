@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
 import api from '../api';
 
 const AuthContext = createContext();
@@ -26,7 +25,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get('/user/profile');
       setUser(response.data);
       setIsAuthenticated(true);
-    } catch (error) {
+    } catch {
       setIsAuthenticated(false);
       setUser(null);
     } finally {

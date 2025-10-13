@@ -29,7 +29,7 @@ const Profile = () => {
         email: response.data.email,
         phone: response.data.phone
       });
-    } catch (error) {
+    } catch {
       toast.error('Failed to load user profile');
     } finally {
       setLoading(false);
@@ -89,7 +89,7 @@ const Profile = () => {
     try {
       await api.put('/user/profile', user);
       toast.success('Profile updated successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to update profile');
     } finally {
       setSaving(false);

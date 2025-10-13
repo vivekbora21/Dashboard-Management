@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
-import axios from "axios";
 import api from "../../api";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Signup.css';
 
-const Signup = ({ onSwitchToLogin }) => {
+const Signup = () => {
   const inputRef = useRef(null)
   const navigate = useNavigate();
   const [formData, setFormData] = useState({

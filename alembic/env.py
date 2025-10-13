@@ -1,10 +1,9 @@
 from logging.config import fileConfig
-
+import backend.models 
+from backend.database import Base
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
-
 import sys
 sys.path.insert(0, 'backend')
 
@@ -19,8 +18,6 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-import backend.models  # Import models to populate metadata
-from backend.database import Base
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

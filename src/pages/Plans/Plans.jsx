@@ -38,7 +38,7 @@ const Plans = () => {
       await assignPlan(user.id, selectedPlan);
       toast.success("Plan assigned successfully to your account!");
       setSelectedPlan(""); 
-    } catch (error) {
+    } catch {
       toast.error("Failed to assign plan");
     } finally {
       setAssignLoading(false);
@@ -51,7 +51,7 @@ const Plans = () => {
         <div className="plans-header">
           <h1>
             <Crown className="crown-icon" size={32} />
-            My Subscription Plans
+            Subscription Plans
           </h1>
           <p>Choose the perfect plan for your needs</p>
         </div>

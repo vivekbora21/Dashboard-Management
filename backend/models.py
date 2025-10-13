@@ -14,8 +14,6 @@ class Plan(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    user_plans = relationship("UserPlan", back_populates="plan")
-
 class User(Base):
     __tablename__ = "users"
 
@@ -28,7 +26,6 @@ class User(Base):
 
     products = relationship("Product", back_populates="user")
     subscriptions = relationship("Subscription", back_populates="user")
-    user_plan = relationship("UserPlan", back_populates="user", uselist=False)
 
 class Product(Base):
     __tablename__ = "products"
@@ -46,18 +43,7 @@ class Product(Base):
 
     user = relationship("User", back_populates="products")
 
-class UserPlan(Base):
-    __tablename__ = "user_plans"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
-    plan_id = Column(Integer, ForeignKey("plans.id"), nullable=False)
-    expiry = Column(DateTime, nullable=True)
-    status = Column(String(50), default="active")
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    user = relationship("User", back_populates="user_plan")
-    plan = relationship("Plan", back_populates="user_plans")
 
 class OTP(Base):
     __tablename__ = "otps"

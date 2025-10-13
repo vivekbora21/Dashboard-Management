@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import api from '../../api';
 import './Dashboard.css';
 import StatCard from "../../components/StatCard.jsx";
@@ -112,7 +112,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-page">
       <div className="page-header">
-        <h1>Welcome! Here's your Dashboard Summary</h1>
+        <h1>Welcome! Here's your Sales Summary</h1>
         <p>{formattedDateTime}</p>
       </div>
 

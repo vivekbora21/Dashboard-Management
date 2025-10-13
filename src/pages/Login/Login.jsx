@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../../contexts/AuthContext';
 import './Login.css';
 
-const Login = ({ onSwitchToSignup }) => {
+const Login = () => {
   const [formData, setFormData] = useState({email: '',password: ''})
   const navigate = useNavigate();
   const { login } = useAuth();

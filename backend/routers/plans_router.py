@@ -31,8 +31,8 @@ def get_plans(db: Session = Depends(get_db)):
 
 @router.put("/users/{user_id}/plan/{plan_id}")
 def assign_plan_to_user(user_id: int, plan_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    updated_user = crud.update_user_plan(db, user_id, plan_id)
-    if not updated_user:
+    subscription = crud.update_user_plan(db, user_id, plan_id)
+    if not subscription:
         raise HTTPException(status_code=404, detail="User or Plan not found")
     return {"message": f"Plan {plan_id} assigned to user {user_id}"}
 

@@ -24,16 +24,8 @@ def create_user(db: Session, user: schemas.UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        # Assign free plan (id=1) by default
-        db_user_plan = models.UserPlan(
-            user_id=db_user.id,
-            plan_id=1,  # Assuming 1 is free plan
-            expiry=None,  # Free plan, no expiry
-            status="active"
-        )
-        db.add(db_user_plan)
-        db.commit()
-        db.refresh(db_user_plan)
+        # Assign free plan (id=1) by default via subscription
+        create_subscription(db, db_user.id, 1)
         return db_user
     except IntegrityError:
         db.rollback()
@@ -224,42 +216,32 @@ def update_user_plan(db: Session, user_id: int, plan_id: int):
     db_plan = db.query(models.Plan).filter(models.Plan.id == plan_id).first()
     if not db_plan:
         return None
-    # Check if user already has a plan
-    db_user_plan = db.query(models.UserPlan).filter(models.UserPlan.user_id == user_id).first()
-    if db_user_plan:
-        # Update existing
-        db_user_plan.plan_id = plan_id
-        db_user_plan.expiry = datetime.now() + timedelta(days=30)
-        db_user_plan.status = "active"
-    else:
-        # Create new
-        db_user_plan = models.UserPlan(
-            user_id=user_id,
-            plan_id=plan_id,
-            expiry=datetime.now() + timedelta(days=30),
-            status="active"
-        )
-        db.add(db_user_plan)
-    db.commit()
-    db.refresh(db_user_plan)
-    # Create subscription record
-    create_subscription(db, user_id, plan_id, db_user_plan.expiry)
-    return db_user_plan
+    # Create subscription record with 30-day expiry
+    end_date = datetime.now() + timedelta(days=30)
+    subscription = create_subscription(db, user_id, plan_id, end_date)
+    return subscription
 
 def get_user_current_plan(db: Session, user_id: int):
-    db_user_plan = db.query(models.UserPlan).filter(models.UserPlan.user_id == user_id, models.UserPlan.status == "active").first()
-    if not db_user_plan or (db_user_plan.expiry and db_user_plan.expiry < datetime.now()):
+    # Get the most recent active subscription for the user
+    db_subscription = db.query(models.Subscription).filter(
+        models.Subscription.user_id == user_id,
+        models.Subscription.status == "active"
+    ).order_by(models.Subscription.start_date.desc()).first()
+
+    if not db_subscription or (db_subscription.end_date and db_subscription.end_date < datetime.now()):
         return None
-    plan = db.query(models.Plan).filter(models.Plan.id == db_user_plan.plan_id).first()
+
+    plan = db.query(models.Plan).filter(models.Plan.id == db_subscription.plan_id).first()
     if not plan:
         return None
+
     return {
         "id": plan.id,
         "name": plan.name,
         "price": plan.price,
         "description": plan.description,
         "features": plan.features,
-        "expiry": db_user_plan.expiry
+        "expiry": db_subscription.end_date
     }
 
 def create_subscription(db: Session, user_id: int, plan_id: int, end_date: datetime = None):

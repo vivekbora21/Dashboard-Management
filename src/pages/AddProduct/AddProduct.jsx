@@ -10,7 +10,7 @@ const AddProduct = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showManualForm, setShowManualForm] = useState(false);
   const [showUploadControls, setShowUploadControls] = useState(false);
-  const [uploadedProducts, setUploadedProducts] = useState([]);
+
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -30,35 +30,41 @@ const AddProduct = () => {
     let error = "";
 
     switch (name) {
-      case "productName":
+      case "productName": {
         if (!value.trim()) error = "Product name is required";
         break;
+      }
 
-      case "productCategory":
+      case "productCategory": {
         if (!value.trim()) error = "Product category is required";
         break;
+      }
 
-      case "productPrice":
+      case "productPrice": {
         const price = parseFloat(value);
         if (isNaN(price) || price <= 0) error = "Product price must be greater than 0";
         break;
+      }
 
-      case "sellingPrice":
+      case "sellingPrice": {
         const sellPrice = parseFloat(value);
         if (isNaN(sellPrice) || sellPrice <= 0) error = "Selling price must be greater than 0";
         break;
+      }
 
-      case "quantity":
+      case "quantity": {
         const qty = parseInt(value, 10);
         if (isNaN(qty) || qty <= 0) error = "Quantity must be greater than 0";
         break;
+      }
 
-      case "ratings":
+      case "ratings": {
         if (value !== "") {
           const rating = parseFloat(value);
           if (isNaN(rating) || rating < 0 || rating > 5) error = "Ratings must be between 0 and 5";
         }
         break;
+      }
 
       default:
         break;
@@ -82,7 +88,6 @@ const AddProduct = () => {
       const data = res.data;
 
       toast.success(`${data.products.length} products uploaded successfully`);
-      setUploadedProducts(data.products);
       setSelectedFile(null);
       navigate("/dashboard/products");
     } catch (err) {
@@ -134,7 +139,6 @@ const AddProduct = () => {
     try {
       const res = await api.post("/manual-update/", dataToSend);
       toast.success("Manual product added successfully");
-      setUploadedProducts((prev) => [...prev, res.data.productName]);
       navigate("/dashboard/products");
     } catch (err) {
       console.error(err);
@@ -190,6 +194,15 @@ const AddProduct = () => {
         <section className="upload-section">
           <div className="section-icon">📁</div>
           <h3>Upload File</h3>
+          <div className="instructions">
+            <h4>How to Upload Products:</h4>
+            <ol>
+              <li>Download the sample Excel file using the link below.</li>
+              <li>Open the file and fill in details for up to 10 products. Do not exceed 10 products.</li>
+              <li>Save the file and select it using the file input below.</li>
+              <li>Click the "Upload" button to submit your products.</li>
+            </ol>
+          </div>
           <div className="upload-controls">
             <input
               type="file"
