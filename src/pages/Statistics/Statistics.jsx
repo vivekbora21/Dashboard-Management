@@ -6,6 +6,7 @@ import api from "../../api.js";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import "./Statistics.css";
+import { FaDownload } from 'react-icons/fa';
 
 const Statistics = () => {
   const [stats, setStats] = useState(null);
@@ -70,7 +71,6 @@ const Statistics = () => {
     },
   ];
 
-  // Prepare data for Category Performance Comparison (sales vs profit per category)
   const categoryPerformanceData = stats.category_distribution.map(cat => {
     const profitCat = stats.profit_per_category.find(p => p.productCategory === cat.category);
     return {
@@ -99,7 +99,7 @@ const Statistics = () => {
         <h1>📊 Statistical Analytics</h1>
         <p>All your important statistics at a glance</p>
         <button className="download-btn" onClick={handleDownloadPDF}>
-          📥 Download PDF
+          <FaDownload/> Download PDF
         </button>
       </div>
 
