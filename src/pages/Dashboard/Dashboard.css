@@ -10,25 +10,41 @@ body {
   color: #333;
 }
 
-/* ============ PAGE HEADER ============ */
-.page-header {
-  max-width: 1200px;
+.page-heading-container {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  padding: 30px;
   margin: 0 auto 40px auto;
-  text-align: center;
+  max-width: 1200px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.2);
   animation: fadeInUp 0.6s ease-out;
+  text-align: center;
 }
 
-.page-header h1 {
+.page-heading-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 20px 20px 0 0;
+}
+
+.page-heading-container h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 8px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  color: #2d3748;
+  margin: 0 0 8px 0;
+  text-shadow: none;
 }
 
-.page-header p {
+.page-heading-container p {
   font-size: 1.2rem;
-  color: #e0e7ff;
+  color: #4a5568;
 }
 
 /* ============ STATS GRID ============ */

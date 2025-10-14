@@ -171,7 +171,7 @@ const AddProduct = () => {
 
   return (
     <div className="add-product-page">
-      <div className="page-header">
+      <div className="page-heading-container">
         <h1> Products Management <MdDriveFolderUpload/></h1>
         <p>Upload your product Excel or add products manually</p>
       </div>

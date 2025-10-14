@@ -113,7 +113,9 @@ const Products = () => {
 
   return (
     <div className="products-container">
-      <h1><FaList/>  Products</h1>
+      <div className="page-heading-container">
+        <h1><FaList/>  Products</h1>
+      </div>
       <table className="products-table">
         <thead>
           <tr>

@@ -120,7 +120,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
-      <div className="page-header">
+      <div className="page-heading-container">
         <h1>Welcome! Here's your Sales Summary</h1>
         <p>{formattedDateTime}</p>
       </div>

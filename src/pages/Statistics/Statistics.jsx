@@ -107,7 +107,6 @@ const Statistics = () => {
   }, [stats?.category_distribution, stats?.profit_per_category]);
 
   const handleDownloadPDF = async () => {
-    // Preload libraries if not already loaded
     const html2canvasPromise = import("html2canvas");
     const jsPDFPromise = import("jspdf");
 
@@ -118,7 +117,7 @@ const Statistics = () => {
 
     const input = statsRef.current;
     const canvas = await html2canvas(input, {
-      scale: 2, // Reduced scale for better performance
+      scale: 2, 
       backgroundColor: "#fff",
       allowTaint: true,
     });
@@ -136,13 +135,14 @@ const Statistics = () => {
 
   return (
     <div className="statistics-page">
-      <div className="page-header">
+      <div className="page-heading-container">
         <h1>📊 Statistical Analytics</h1>
         <p>All your important statistics at a glance</p>
-        <button className="download-btn" onClick={handleDownloadPDF}>
-          <FaDownload /> Download PDF
-        </button>
       </div>
+
+      <button className="download-btn" onClick={handleDownloadPDF}>
+        <FaDownload /> Download PDF
+      </button>
 
       <div className="chart-grid" ref={statsRef}>
         <div className="chart-card">
