@@ -37,7 +37,7 @@ const SidebarLayout = () => {
     <div className="dashboard-container">
       <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
-          <h6 className="logo" onClick={()=> navigate('/dashboard')}>{isCollapsed ? 'SM' : 'SalesManager'}</h6>
+          <h6 className="logo" onClick={()=> navigate('/dashboard')}>{!isCollapsed ? 'SalesManager' : "SM"}</h6>
           <button className="toggle-btn" onClick={toggleSidebar}>
             {isCollapsed ? <Menu size={20} /> : <X size={20} />}
           </button>
