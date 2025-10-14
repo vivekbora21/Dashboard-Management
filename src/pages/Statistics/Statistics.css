@@ -92,15 +92,16 @@ body {
 }
 
 .chart-card {
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  padding: 30px;
+  background: #ffffff;
+  padding: 25px;
   width: 90%;
   margin-left: 5%;
   margin-bottom: 30px;
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
   border: 1px solid rgba(255,255,255,0.2);
+  min-height: 350px; /* Adjusted height to prevent CLS and improve display */
   /* animation: slideIn 0.8s ease-out; */
 }
 
@@ -153,21 +154,3 @@ body {
     padding: 20px;
   }
 }
-
-/* ============ ANIMATIONS ============ */
-/* @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(50px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes bounceIn {
-  0% { opacity: 0; transform: scale(0.3); }
-  50% { opacity: 1; transform: scale(1.05); }
-  70% { transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
-} */

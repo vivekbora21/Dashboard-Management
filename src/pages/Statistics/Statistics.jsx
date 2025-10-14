@@ -107,12 +107,18 @@ const Statistics = () => {
   }, [stats?.category_distribution, stats?.profit_per_category]);
 
   const handleDownloadPDF = async () => {
-    const { default: html2canvas } = await import("html2canvas");
-    const { default: jsPDF } = await import("jspdf");
+    // Preload libraries if not already loaded
+    const html2canvasPromise = import("html2canvas");
+    const jsPDFPromise = import("jspdf");
+
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+      html2canvasPromise,
+      jsPDFPromise,
+    ]);
 
     const input = statsRef.current;
     const canvas = await html2canvas(input, {
-      scale: 3,
+      scale: 2, // Reduced scale for better performance
       backgroundColor: "#fff",
       allowTaint: true,
     });
@@ -154,7 +160,7 @@ const Statistics = () => {
         </div>
 
         <div className="chart-card">
-          <h3>Category Distribution (Pie)</h3>
+          <h3>Category Distribution</h3>
           <Suspense fallback={<ChartLoader />}>
             <CategoryDistributionChart data={stats.category_distribution} />
           </Suspense>

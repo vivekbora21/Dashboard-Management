@@ -1,36 +1,50 @@
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 const CategoryDistributionChart = ({ data }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
+  const chartData = {
+    labels: data.map(item => item.category),
+    datasets: [
+      {
+        data: data.map(item => item.value),
+        backgroundColor: COLORS,
+        borderColor: COLORS,
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const value = context.parsed;
+            const percentage = ((value / total) * 100).toFixed(1);
+            return value.toLocaleString() + ' (' + percentage + '%)';
+          },
+        },
+        backgroundColor: '#333',
+        titleColor: '#00ffb3',
+        bodyColor: '#00ffb3',
+      },
+    },
+  };
+
   return (
-    <div style={{ width: '100%', height: 300 }}>
-      <ResponsiveContainer>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ value }) => `${((value / total) * 100).toFixed(1)}%`}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip
-            formatter={(value) => [value.toLocaleString(), 'Value']}
-            labelStyle={{ color: '#00ffb3' }}
-            contentStyle={{ backgroundColor: '#333', border: 'none' }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+    <div style={{ width: '100%', height: 300 , display: "flex", justifyContent: "center", alignItems: "center"}}>
+      <Pie data={chartData} options={options} />
     </div>
   );
 };
