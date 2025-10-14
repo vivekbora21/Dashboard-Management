@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ResponsiveBar } from "@nivo/bar";
 import { ResponsiveLine } from "@nivo/line";
+import { ResponsivePie } from "@nivo/pie";
 import api from "../../api.js";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -19,14 +20,16 @@ const Statistics = () => {
           profitPerProductRes,
           topProductsRes,
           profitPerCategoryRes,
-          avgRatingsRes
+          avgRatingsRes,
+          categoryDistributionRes
         ] = await Promise.all([
           api.get("/statistics/sales-trend"),
           api.get("/statistics/daily-sales"),
           api.get("/statistics/profit-per-product"),
           api.get("/statistics/top-products"),
           api.get("/statistics/profit-per-category"),
-          api.get("/statistics/avg-ratings")
+          api.get("/statistics/avg-ratings"),
+          api.get("/statistics/category-distribution")
         ]);
         setStats({
           sales_trend: salesTrendRes.data,
@@ -34,7 +37,8 @@ const Statistics = () => {
           profit_per_product: profitPerProductRes.data,
           top_products: topProductsRes.data,
           profit_per_category: profitPerCategoryRes.data,
-          avg_ratings: avgRatingsRes.data
+          avg_ratings: avgRatingsRes.data,
+          category_distribution: categoryDistributionRes.data
         });
       } catch (error) {
         console.error("Error fetching statistics:", error);
@@ -45,7 +49,6 @@ const Statistics = () => {
 
   if (!stats) return <div className="loading">Loading statistics...</div>;
 
-  // Format line data for Nivo
   const salesTrendData = [
     {
       id: "Sales",
@@ -67,7 +70,16 @@ const Statistics = () => {
     },
   ];
 
-  // Download PDF function
+  // Prepare data for Category Performance Comparison (sales vs profit per category)
+  const categoryPerformanceData = stats.category_distribution.map(cat => {
+    const profitCat = stats.profit_per_category.find(p => p.productCategory === cat.category);
+    return {
+      category: cat.category,
+      sales: cat.value,
+      profit: profitCat ? profitCat.profit : 0
+    };
+  });
+
   const handleDownloadPDF = async () => {
     const input = statsRef.current;
     const canvas = await html2canvas(input, { scale: 3 , backgroundColor: "#fff", allowTaint: true});
@@ -92,7 +104,6 @@ const Statistics = () => {
       </div>
 
       <div className="chart-grid" ref={statsRef}>
-        {/* Monthly Sales & Profit Trend */}
         <div className="chart-card">
           <h3>Monthly Sales & Profit Trend</h3>
           <div style={{ height: 300 }}>
@@ -123,7 +134,6 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* Daily Sales Count */}
         <div className="chart-card">
           <h3>Daily Sales Count</h3>
           <div style={{ height: 300 }}>
@@ -153,8 +163,89 @@ const Statistics = () => {
             />
           </div>
         </div>
-
-        {/* Profit per Product */}
+        <div className="chart-card">
+          <h3>Category Distribution (Pie)</h3>
+          <div style={{ height: 300 }}>
+            {(() => {
+              const total = stats.category_distribution.reduce((sum, item) => sum + item.value, 0);
+              return (
+                <ResponsivePie
+                  data={stats.category_distribution.map(item => ({
+                    id: item.category,
+                    label: item.category,
+                    value: item.value
+                  }))}
+                  margin={{ top: 30, right: 40, bottom: 80, left: 60 }}
+                  innerRadius={0.5}
+                  padAngle={0.7}
+                  cornerRadius={3}
+                  colors={{ scheme: "paired" }}
+                  borderWidth={1}
+                  borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
+                  radialLabelsSkipAngle={10}
+                  radialLabelsTextXOffset={6}
+                  radialLabelsTextColor="#333333"
+                  radialLabelsLinkOffset={0}
+                  radialLabelsLinkDiagonalLength={16}
+                  radialLabelsLinkHorizontalLength={24}
+                  radialLabelsLinkStrokeWidth={1}
+                  radialLabelsLinkColor={{ from: "color" }}
+                  slicesLabelsSkipAngle={10}
+                  slicesLabelsTextColor="#333333"
+                  slicesLabelsText={({ datum }) => `${((datum.value / total) * 100).toFixed(1)}%`}
+                  animate={true}
+                  motionStiffness={90}
+                  motionDamping={15}
+                  tooltip={({ datum }) => (
+                    <div
+                      style={{
+                        background: "#333",
+                        color: "#00ffb3",
+                        padding: "6px 10px",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      <strong>{datum.label}</strong>
+                      <br />
+                      Value: {datum.value.toLocaleString()}
+                      <br />
+                      Share: {((datum.value / total) * 100).toFixed(1)}%
+                    </div>
+                  )}
+                />
+              );
+            })()}
+          </div>
+        </div>
+        <div className="chart-card">
+          <h3>Category Performance Comparison</h3>
+          <div style={{ height: 300 }}>
+            <ResponsiveBar
+              data={categoryPerformanceData}
+              keys={["sales", "profit"]}
+              indexBy="category"
+              margin={{ top: 30, right: 40, bottom: 80, left: 60 }}
+              padding={0.3}
+              colors={{ scheme: "set2" }}
+              tooltip={({ indexValue, value, id }) => (
+                <div
+                  style={{
+                    background: "#333",
+                    color: "#00ffb3",
+                    padding: "6px 10px",
+                    borderRadius: "5px",
+                  }}
+                >
+                  <strong>{indexValue}</strong>
+                  <br />
+                  {id}: {value.toLocaleString()}
+                </div>
+              )}
+              axisBottom={{ tickRotation: -45 }}
+              axisLeft={{ tickSize: 5, tickPadding: 5, format: value => value.toLocaleString() }}
+            />
+          </div>
+        </div>
         <div className="chart-card">
           <h3>Profit per Product</h3>
           <div style={{ height: 300 }}>
@@ -184,8 +275,6 @@ const Statistics = () => {
             />
           </div>
         </div>
-
-        {/* Top 5 Selling Products */}
         <div className="chart-card">
           <h3>Top 5 Selling Products</h3>
           <div style={{ height: 300 }}>
@@ -215,8 +304,6 @@ const Statistics = () => {
             />
           </div>
         </div>
-
-        {/* Profit per Category */}
         <div className="chart-card">
           <h3>Profit per Category</h3>
           <div style={{ height: 300 }}>
@@ -246,8 +333,6 @@ const Statistics = () => {
             />
           </div>
         </div>
-
-        {/* Average Ratings per Category */}
         <div className="chart-card">
           <h3>Average Ratings per Category</h3>
           <div style={{ height: 300 }}>
@@ -277,6 +362,7 @@ const Statistics = () => {
             />
           </div>
         </div>
+        
       </div>
     </div>
   );
