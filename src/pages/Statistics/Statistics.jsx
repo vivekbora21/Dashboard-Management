@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from "react";
+import React, { useState, useEffect, useRef, useMemo, Suspense, lazy,  } from "react";
 import api from "../../api.js";
 import "./Statistics.css";
 import { FaDownload } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const SalesTrendChart = lazy(() => import("./components/SalesTrendChart"));
 const DailySalesChart = lazy(() => import("./components/DailySalesChart"));
@@ -31,6 +32,7 @@ const ChartLoader = () => (
 const Statistics = () => {
   const [stats, setStats] = useState(null);
   const statsRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -132,6 +134,23 @@ const Statistics = () => {
   };
 
   if (!stats) return <div className="loading">Loading statistics...</div>;
+
+  const hasData = Object.values(stats).some((data) => Array.isArray(data) && data.length > 0);
+  if (!hasData) {
+    return (
+      <div className="statistics-page">
+        <div className="page-heading-container">
+          <h1>📊 Statistical Analytics</h1>
+          <p>All your important statistics at a glance</p>
+        </div>
+        <div className="no-data-message">
+          <h2>No Products Added Yet</h2>
+          <p>Please add some products to view statistics and charts.</p>
+          <button className="add-btn" onClick={() => navigate("/dashboard/addproduct")}>Add Product</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="statistics-page">

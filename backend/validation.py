@@ -9,7 +9,7 @@ def validate_signup(db: Session, user):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
 def validate_login(db: Session, user):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    db_user = db.query(models.User).filter(models.User.email == user.email.lower()).first()
     if not db_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email or password")
 

@@ -7,17 +7,28 @@ import './SidebarLayout.css';
 import Loading from '../../components/Loading';
 import { BiLogOut } from 'react-icons/bi';
 import { Menu, X, LayoutDashboard, Plus, BarChart3, Package, User, CreditCard } from 'lucide-react';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 const SidebarLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, loggingOut } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
     await logout();
     toast.success('Logged out successfully.');
     navigate('/login');
+    setShowLogoutModal(false);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const toggleSidebar = () => {
@@ -58,7 +69,7 @@ const SidebarLayout = () => {
           </ul>
         </nav>
         <div className="logout-section">
-          <button onClick={handleLogout} className="logout-btn" disabled={loggingOut}>
+          <button onClick={handleLogoutClick} className="logout-btn" disabled={loggingOut}>
             {loggingOut ? <Loading size={20} /> : (isCollapsed ? <BiLogOut/> : 'Logout')}
           </button>
         </div>
@@ -67,6 +78,14 @@ const SidebarLayout = () => {
       <main className={`main-content ${isCollapsed ? 'collapsed' : ''}`}>
         <Outlet />
       </main>
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={cancelLogout}
+        onConfirm={confirmLogout}
+        message="Are you sure you want to log out?"
+        confirmText="Logout"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

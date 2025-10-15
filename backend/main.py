@@ -68,7 +68,7 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     new_user = models.User(
         firstName=user.firstName,
         lastName=user.lastName,
-        email=user.email,
+        email=user.email.lower(),
         phone=user.phone,
         hashed_password=hashed_pw
     )

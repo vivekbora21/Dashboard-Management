@@ -5,6 +5,7 @@ import './Products.css';
 import { AiFillDelete } from 'react-icons/ai';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { FaList } from 'react-icons/fa';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,8 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [formData, setFormData] = useState({
@@ -65,18 +68,30 @@ const Products = () => {
     setShowModal(true);
   };
 
-  const handleDelete = useCallback(async (productId) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+  const handleDeleteClick = (productId) => {
+    setProductToDelete(productId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = useCallback(async () => {
+    if (productToDelete) {
       try {
-        await api.delete(`/products/${productId}`);
+        await api.delete(`/products/${productToDelete}`);
         toast.success('Product deleted successfully');
         fetchProducts(currentPage);
+        setShowDeleteModal(false);
+        setProductToDelete(null);
       } catch (error) {
         console.error('Error deleting product:', error);
         toast.error('Failed to delete product');
       }
     }
-  }, [currentPage, fetchProducts]);
+  }, [productToDelete, currentPage, fetchProducts]);
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
+  };
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -147,7 +162,7 @@ const Products = () => {
                 <td>{product.soldDate}</td>
                 <td>
                   <button className="update-btn" onClick={() => handleUpdate(product)}><HiOutlinePencilAlt/></button>
-                  <button className="delete-btn" onClick={() => handleDelete(product.id)}><AiFillDelete /></button>
+                  <button className="delete-btn" onClick={() => handleDeleteClick(product.id)}><AiFillDelete /></button>
                 </td>
               </tr>
             );
@@ -228,6 +243,14 @@ const Products = () => {
           </div>
         </div>
       )}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        message="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };
