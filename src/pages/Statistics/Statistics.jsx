@@ -3,6 +3,7 @@ import api from "../../api.js";
 import "./Statistics.css";
 import { FaDownload } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SalesTrendChart = lazy(() => import("./components/SalesTrendChart"));
 const DailySalesChart = lazy(() => import("./components/DailySalesChart"));
@@ -30,9 +31,11 @@ const ChartLoader = () => (
 );
 
 const Statistics = () => {
+  const { userPlan } = useAuth();
   const [stats, setStats] = useState(null);
   const statsRef = useRef();
   const navigate = useNavigate();
+  const PLAN_LEVELS = {free: 1, basic: 2, premium: 3};
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -164,60 +167,148 @@ const Statistics = () => {
       </button>
 
       <div className="chart-grid" ref={statsRef}>
-        <div className="chart-card">
-          <h3>Monthly Sales & Profit Trend</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <SalesTrendChart data={salesTrendData} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Monthly Sales & Profit Trend</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <SalesTrendChart data={salesTrendData} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Free Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="chart-card">
-          <h3>Daily Sales Count</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <DailySalesChart data={dailySalesData} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Daily Sales Count</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <DailySalesChart data={dailySalesData} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Free Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="chart-card">
-          <h3>Category Distribution</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <CategoryDistributionChart data={stats.category_distribution} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Category Distribution</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <CategoryDistributionChart data={stats.category_distribution} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Basic Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="chart-card">
-          <h3>Category Performance Comparison</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <CategoryPerformanceChart data={categoryPerformanceData} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Category Performance Comparison</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <CategoryPerformanceChart data={categoryPerformanceData} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Basic Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="chart-card">
-          <h3>Profit per Product</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <ProfitPerProductChart data={stats.profit_per_product} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Profit per Product</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <ProfitPerProductChart data={stats.profit_per_product} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Basic Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="chart-card">
-          <h3>Top 5 Selling Products</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <TopProductsChart data={stats.top_products} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Top 5 Selling Products</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <TopProductsChart data={stats.top_products} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Premium Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="chart-card">
-          <h3>Profit per Category</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <ProfitPerCategoryChart data={stats.profit_per_category} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Profit per Category</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <ProfitPerCategoryChart data={stats.profit_per_category} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Premium Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="chart-card">
-          <h3>Average Ratings per Category</h3>
-          <Suspense fallback={<ChartLoader />}>
-            <AvgRatingsChart data={stats.avg_ratings} />
-          </Suspense>
+        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] ? 'locked' : ''}`}>
+          <div className="chart-card">
+            <h3>Average Ratings per Category</h3>
+            <Suspense fallback={<ChartLoader />}>
+              <AvgRatingsChart data={stats.avg_ratings} />
+            </Suspense>
+          </div>
+          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] && (
+            <div className="lock-overlay">
+              <div className="lock-icon">🔒</div>
+              <p>Upgrade to Premium Plan</p>
+              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                Upgrade Now
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

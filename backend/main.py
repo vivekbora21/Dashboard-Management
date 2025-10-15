@@ -6,7 +6,7 @@ from typing import List
 import pandas as pd
 from datetime import datetime, date
 import models
-import schemas
+import schemas 
 import auth
 import otp_utils
 import email_utils
@@ -342,3 +342,12 @@ def reset_password(request: dict, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Password reset successfully"}
+
+@app.get("/user/plan")
+def get_user_plan(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    current_plan = crud.get_user_current_plan(db, current_user.id)
+    print("Current plan fetched:", current_plan)
+    if current_plan:
+        return {"plan": current_plan["name"]}
+    else:
+        return {"plan": "free"}

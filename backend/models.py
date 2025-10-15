@@ -58,7 +58,7 @@ class Subscription(Base):
     plan_id = Column(Integer, ForeignKey("plans.id"))
     start_date = Column(DateTime, default=datetime.utcnow)
     end_date = Column(DateTime, nullable=True)
-    status = Column(String(50), default="active")           
+    status = Column(Integer, default=1)
     payment_id = Column(String(255), nullable=True)                 
     created_at = Column(DateTime, default=datetime.utcnow)
 

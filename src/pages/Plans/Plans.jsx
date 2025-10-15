@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { Loader2, Crown, Users, ArrowRight } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import "./Plans.css";
+import { useNavigate } from "react-router-dom";
 
 const Plans = () => {
   const { user } = useAuth();
@@ -12,6 +13,7 @@ const Plans = () => {
   const [currentPlan, setCurrentPlan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [assignLoading, setAssignLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -38,6 +40,7 @@ const Plans = () => {
       await assignPlan(user.id, selectedPlan);
       toast.success("Plan assigned successfully to your account!");
       setSelectedPlan(""); 
+      navigate("/dashboard")
     } catch {
       toast.error("Failed to assign plan");
     } finally {

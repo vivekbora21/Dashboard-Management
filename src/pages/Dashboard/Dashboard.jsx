@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import api from '../../api';
 import './Dashboard.css';
 import StatCard from "../../components/StatCard.jsx";
 import Loading from "../../components/Loading";
+import { useAuth } from '../../contexts/AuthContext';
 
 const Dashboard = () => {
+  const { userPlan } = useAuth();
   const [products, setProducts] = useState([]);
   const [stats, setStats] = useState({
     totalSales: 0,
@@ -23,8 +26,8 @@ const Dashboard = () => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [loadingStats, setLoadingStats] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [userPlan, setUserPlan] = useState("");
   const PLAN_LEVELS = {free: 1, basic: 2, premium: 3};
+  const navigate = useNavigate();
 
   const fetchStats = useCallback(async () => {
     setLoadingStats(true);
@@ -101,12 +104,6 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [fetchStats, fetchTopProducts]);
 
-  useEffect(() => {
-  api.get("/user/plan")
-     .then(res => setUserPlan(res.data.plan))
-     .catch(err => console.error("Error fetching user plan:", err));
-}, []);
-
   const formattedDateTime = currentDateTime.toLocaleDateString('en-US',
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
 
@@ -148,6 +145,9 @@ const Dashboard = () => {
                   <div className="lock-overlay">
                     <span className="lock-icon">🔒</span>
                     <p>Upgrade to {item.minPlan.charAt(0).toUpperCase() + item.minPlan.slice(1)}</p>
+                    <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+                      Upgrade Now
+                    </button>
                   </div>
                 )}
               </div>

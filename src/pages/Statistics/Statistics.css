@@ -119,18 +119,66 @@ body {
   background: linear-gradient(145deg, #edf2f7 0%, #ffffff 100%);
 }
 
-.chart-card {
-  background: #ffffff;
-  padding: 25px;
+.chart-wrapper {
+  position: relative;
   width: 90%;
   margin-left: 5%;
   margin-bottom: 30px;
+}
+
+.chart-card {
+  background: #ffffff;
+  padding: 25px;
   border-radius: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
   border: 1px solid rgba(255,255,255,0.2);
   min-height: 350px; /* Adjusted height to prevent CLS and improve display */
   /* animation: slideIn 0.8s ease-out; */
+}
+
+.lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.lock-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.lock-overlay p {
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.upgrade-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.upgrade-btn:hover {
+  background: #5a67d8;
+  transform: translateY(-2px);
 }
 
 .chart-card h3 {

@@ -224,7 +224,7 @@ def update_user_plan(db: Session, user_id: int, plan_id: int):
 def get_user_current_plan(db: Session, user_id: int):
     db_subscription = db.query(models.Subscription).filter(
         models.Subscription.user_id == user_id,
-        models.Subscription.status == "active"
+        models.Subscription.status == 1
     ).order_by(models.Subscription.start_date.desc()).first()
 
     if not db_subscription or (db_subscription.end_date and db_subscription.end_date < datetime.now()):
@@ -249,7 +249,7 @@ def create_subscription(db: Session, user_id: int, plan_id: int, end_date: datet
         plan_id=plan_id,
         start_date=datetime.now(),
         end_date=end_date,
-        status="active"
+        status=1
     )
     db.add(db_subscription)
     db.commit()
@@ -259,10 +259,10 @@ def create_subscription(db: Session, user_id: int, plan_id: int, end_date: datet
 def update_subscription(db: Session, user_id: int, plan_id: int, end_date: datetime):
     db_subscription = db.query(models.Subscription).filter(
         models.Subscription.user_id == user_id,
-        models.Subscription.status == "active"
+        models.Subscription.status == 1
     ).first()
     if db_subscription:
-        db_subscription.status = None
+        db_subscription.status = 0
         db.commit()
         db.refresh(db_subscription)
         return db_subscription

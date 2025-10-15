@@ -199,12 +199,14 @@ tr:hover td {
 
 .card-wrapper {
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
 }
 
-.card-wrapper.locked {
-  filter: blur(1.5px) brightness(0.8);
+.card-wrapper.locked .stat-card {
+  filter: blur(2px) brightness(0.7) saturate(0.8);
   pointer-events: none;
+  transform: scale(0.98);
+  opacity: 0.9;
 }
 
 .lock-overlay {
@@ -214,16 +216,67 @@ tr:hover td {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%);
   border-radius: 1rem;
-  color: white;
-  font-weight: 500;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: lockFadeIn 0.5s ease-out;
+}
+
+.lock-overlay p {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 .lock-icon {
-  font-size: 2rem;
-  margin-bottom: 0.4rem;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  animation: lockPulse 2s infinite;
+}
+.upgrade-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.upgrade-btn:hover {
+  background: linear-gradient(135deg, #764ba2, #667eea);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+@keyframes lockFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes lockPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* ============ RESPONSIVE ============ */

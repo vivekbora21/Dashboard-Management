@@ -15,6 +15,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [userPlan, setUserPlan] = useState("free");
   const [loading, setLoading] = useState(true);
   const [loggingIn, setLoggingIn] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -28,9 +29,17 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get('/user/profile');
       setUser(response.data);
       setIsAuthenticated(true);
+      const planResponse = await api.get('/user/plan');
+      const plan =
+      planResponse.data.plan?.name ||
+      planResponse.data.plan ||
+      planResponse.data.current_plan ||
+      "free";
+      setUserPlan(plan.toLowerCase());
     } catch {
       setIsAuthenticated(false);
       setUser(null);
+      setUserPlan("free");
     } finally {
       setLoading(false);
     }
@@ -60,7 +69,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, loading, loggingIn, loggingOut, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, userPlan, loading, loggingIn, loggingOut, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
