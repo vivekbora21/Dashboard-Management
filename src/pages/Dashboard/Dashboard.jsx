@@ -23,6 +23,8 @@ const Dashboard = () => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [loadingStats, setLoadingStats] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [userPlan, setUserPlan] = useState("");
+  const PLAN_LEVELS = {free: 1, basic: 2, premium: 3};
 
   const fetchStats = useCallback(async () => {
     setLoadingStats(true);
@@ -99,22 +101,28 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [fetchStats, fetchTopProducts]);
 
+  useEffect(() => {
+  api.get("/user/plan")
+     .then(res => setUserPlan(res.data.plan))
+     .catch(err => console.error("Error fetching user plan:", err));
+}, []);
+
   const formattedDateTime = currentDateTime.toLocaleDateString('en-US',
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
 
   const statItems = [
-  { icon: "💰", title: "Total Sales", value: `₹ ${(stats.totalSales || 0).toLocaleString('en-IN')}` },
-  { icon: "📈", title: "Total Profit", value: `₹ ${(stats.totalProfit || 0).toLocaleString('en-IN')}` },
-  { icon: "📊", title: "Profit Margin", value: `${(stats.profitMargin || 0).toFixed(2)}%` },
-  { icon: "💹", title: "Revenue Growth", value: `${(stats.revenueGrowth || 0).toFixed(1)}%` },
-  { icon: "📊", title: "Total Quantity", value: `${(stats.totalQuantity || 0).toLocaleString('en-IN')}` },
-  { icon: "⭐", title: "Average Rating", value: `${(stats.avgRating || 0).toFixed(1)}/5` },
-  { icon: "🛒", title: "Average Order Value", value: `₹ ${(stats.avgOrderValue || 0).toLocaleString('en-IN')}` },
-  { icon: "🏬", title: "Top Category", value: stats.topCategory || "N/A" },
-  { icon: "💸", title: "Avg Discount Given", value: `₹ ${(stats.avgDiscount || 0).toLocaleString('en-IN')}` },
-  { icon: "🔥", title: "Top Selling Product", value: stats.highestSellingProduct?.productName || "N/A" },
-  { icon: "📦", title: "Total Orders", value: `${(stats.totalOrders || 0).toLocaleString('en-IN')}` },
-  { icon: "🏆", title: "Top Profit Product", value: stats.highestProfitProduct?.productName || "N/A" },
+  { icon: "💰", title: "Total Sales", value: `₹ ${(stats.totalSales || 0).toLocaleString('en-IN')}`, minPlan: 'free'},
+  { icon: "📈", title: "Total Profit", value: `₹ ${(stats.totalProfit || 0).toLocaleString('en-IN')}`, minPlan: 'free' },
+  { icon: "📦", title: "Total Orders", value: `${(stats.totalOrders || 0).toLocaleString('en-IN')}`, minPlan: 'free' },
+  { icon: "📊", title: "Total Quantity", value: `${(stats.totalQuantity || 0).toLocaleString('en-IN')}`, minPlan: 'free' },
+  { icon: "⭐", title: "Average Rating", value: `${(stats.avgRating || 0).toFixed(1)}/5`, minPlan: 'basic' },
+  { icon: "🛒", title: "Average Order Value", value: `₹ ${(stats.avgOrderValue || 0).toLocaleString('en-IN')}`, minPlan: 'basic' },
+  { icon: "🏬", title: "Top Category", value: stats.topCategory || "N/A", minPlan: 'basic' },
+  { icon: "💸", title: "Avg Discount Given", value: `₹ ${(stats.avgDiscount || 0).toLocaleString('en-IN')}`, minPlan: 'basic' },
+  { icon: "🔥", title: "Top Selling Product", value: stats.highestSellingProduct?.productName || "N/A", minPlan: 'premium' },
+  { icon: "🏆", title: "Top Profit Product", value: stats.highestProfitProduct?.productName || "N/A", minPlan: 'premium' },
+  { icon: "📊", title: "Profit Margin", value: `${(stats.profitMargin || 0).toFixed(2)}%`, minPlan: 'premium' },
+  { icon: "💹", title: "Revenue Growth", value: `${(stats.revenueGrowth || 0).toFixed(1)}%`, minPlan: 'premium' }
 ];
 
 
@@ -127,15 +135,27 @@ const Dashboard = () => {
 
       <section className="stats-grid">
         {loadingStats ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+          <div className="loading-center">
             <Loading size={50} />
           </div>
         ) : (
-          statItems.map((item, index) => (
-            <StatCard key={index} icon={item.icon} title={item.title} value={item.value.charAt(0).toUpperCase() + item.value.slice(1)} />
-          ))
+          statItems.map((item, index) => {
+            const hasAccess = PLAN_LEVELS[userPlan] >= PLAN_LEVELS[item.minPlan];
+            return (
+              <div key={index} className={`card-wrapper ${!hasAccess ? 'locked' : ''}`}>
+                <StatCard icon={item.icon} title={item.title} value={item.value} />
+                {!hasAccess && (
+                  <div className="lock-overlay">
+                    <span className="lock-icon">🔒</span>
+                    <p>Upgrade to {item.minPlan.charAt(0).toUpperCase() + item.minPlan.slice(1)}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </section>
+
 
       <section className="products-table">
         <div className="products-header">
