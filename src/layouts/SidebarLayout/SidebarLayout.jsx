@@ -12,7 +12,7 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 const SidebarLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout, loggingOut } = useAuth();
+  const { logout, loggingOut, user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -68,6 +68,14 @@ const SidebarLayout = () => {
             })}
           </ul>
         </nav>
+        <div className="login-dtl">
+          {!isCollapsed && (
+            <>
+              <div>Logged In as:
+              <div className="user-name">{user ? `${user.firstName} ${user.lastName}` : 'Loading...'}</div></div>
+            </>
+          )}
+        </div>
         <div className="logout-section">
           <button onClick={handleLogoutClick} className="logout-btn" disabled={loggingOut}>
             {loggingOut ? <Loading size={20} /> : (isCollapsed ? <BiLogOut/> : 'Logout')}

@@ -112,7 +112,7 @@
 .sidebar li:hover,
 .sidebar li.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  color: #fffdfd;
   transform: translateX(5px);
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
@@ -131,7 +131,6 @@
   gap: 0;
 }
 
-/* ============ MAIN CONTENT ============ */
 .main-content {
   flex: 1;
   display: flex;
@@ -147,10 +146,24 @@
   margin-left: 60px;
 }
 
-/* ============ LOGOUT SECTION ============ */
-.logout-section {
+.login-dtl {
   margin-top: auto;
-  padding-top: 20px;
+  padding: 15px 0;
+  text-align: center;
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #2d3748;
+  margin-top: 5px;
+  font-size: 1rem;
+}
+
+.logout-section {
+  padding-top: 10px;
 }
 
 .logout-btn {
