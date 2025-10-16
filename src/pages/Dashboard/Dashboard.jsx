@@ -46,18 +46,18 @@ const Dashboard = () => {
         avgOrderValueRes,
         topCategoryRes,
       ] = await Promise.all([
-        api.get("/kpi/total_sales"),
-        api.get("/kpi/total_profit"),
-        api.get("/kpi/avg_rating"),
-        api.get("/kpi/total_orders"),
-        api.get("/kpi/total_quantity"),
-        api.get("/kpi/highest_selling_product"),
-        api.get("/kpi/highest_profit_product"),
-        api.get("/kpi/avg_discount"),
-        api.get("/kpi/revenue_growth"),
-        api.get("/kpi/profit_margin"),
-        api.get("/kpi/avg_order_value"),
-        api.get("/kpi/top_category"),
+        api.get("/total_sales"),
+        api.get("/total_profit"),
+        api.get("/avg_rating"),
+        api.get("/total_orders"),
+        api.get("/total_quantity"),
+        api.get("/highest_selling_product"),
+        api.get("/highest_profit_product"),
+        api.get("/avg_discount"),
+        api.get("/revenue_growth"),
+        api.get("/profit_margin"),
+        api.get("/avg_order_value"),
+        api.get("/top_category"),
       ]);
 
       setStats({
@@ -84,7 +84,7 @@ const Dashboard = () => {
   const fetchTopProducts = useCallback(async () => {
     setLoadingProducts(true);
     try {
-      const productsResponse = await api.get("/kpi/top_profit_products", { params: { limit: 5 } });
+      const productsResponse = await api.get("/top_profit_products", { params: { limit: 5 } });
       setProducts(productsResponse.data);
     } catch (error) {
       console.error("Error fetching products:", error);

@@ -1,7 +1,12 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, case
+from sqlalchemy import func
 import models
 from datetime import datetime, timedelta
+from auth import get_current_user
+from fastapi import Depends, APIRouter, Request, HTTPException
+from database import get_db
+
+router = APIRouter(prefix="", tags=["kpi"])
 
 def get_total_sales(db: Session, user_id: int):
     result = db.query(func.sum(models.Product.sellingPrice * models.Product.quantity))\
@@ -116,3 +121,107 @@ def get_revenue_growth(db: Session, user_id: int):
     if last_month_sales == 0:
         return 0.0
     return round(((this_month_sales - last_month_sales) / last_month_sales) * 100, 2)
+
+@router.get("/total_sales")
+def get_kpi_total_sales(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_total_sales(db, user.id)}
+
+@router.get("/total_profit")
+def get_kpi_total_profit(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_total_profit(db, user.id)}
+
+@router.get("/avg_rating")
+def get_kpi_avg_rating(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_avg_rating(db, user.id)}
+
+@router.get("/total_orders")
+def get_kpi_total_orders(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_total_orders(db, user.id)}
+
+@router.get("/total_quantity")
+def get_kpi_total_quantity(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_total_quantity(db, user.id)}
+
+@router.get("/highest_selling_product")
+def get_kpi_highest_selling_product(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return get_highest_selling_product(db, user.id)
+
+@router.get("/highest_profit_product")
+def get_kpi_highest_profit_product(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return get_highest_profit_product(db, user.id)
+
+@router.get("/avg_discount")
+def get_kpi_avg_discount(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_avg_discount(db, user.id)}
+
+@router.get("/top_profit_products")
+def get_kpi_top_profit_products(request: Request, limit: int = 5, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return get_top_profit_products(db, user.id, limit)
+
+@router.get("/revenue_growth")
+def get_kpi_revenue_growth(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_revenue_growth(db, user.id)}
+
+@router.get("/profit_margin")
+def get_kpi_profit_margin(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_profit_margin(db, user.id)}
+
+@router.get("/avg_order_value")
+def get_kpi_avg_order_value(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_avg_order_value(db, user.id)}
+
+@router.get("/top_category")
+def get_kpi_top_category(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+    return {"value": get_top_category(db, user.id)}

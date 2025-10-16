@@ -20,9 +20,10 @@ import kpis
 import validation
 import os
 
-app = FastAPI()
+app = FastAPI(title="Sales Manager API")
 app.include_router(statistics_router)
 app.include_router(plans_router)
+app.include_router(kpis.router)
 models.Base.metadata.create_all(bind=engine)
 MAX_ROWS = 10
 
@@ -189,58 +190,6 @@ def get_products_by_date(
 def get_summary(period: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     summary = crud.get_summary(db, period, current_user.id)
     return summary
-
-@app.get("/kpi/total_sales")
-def get_kpi_total_sales(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_total_sales(db, current_user.id)}
-
-@app.get("/kpi/total_profit")
-def get_kpi_total_profit(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_total_profit(db, current_user.id)}
-
-@app.get("/kpi/avg_rating")
-def get_kpi_avg_rating(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_avg_rating(db, current_user.id)}
-
-@app.get("/kpi/total_orders")
-def get_kpi_total_orders(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_total_orders(db, current_user.id)}
-
-@app.get("/kpi/total_quantity")
-def get_kpi_total_quantity(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_total_quantity(db, current_user.id)}
-
-@app.get("/kpi/highest_selling_product")
-def get_kpi_highest_selling_product(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return kpis.get_highest_selling_product(db, current_user.id)
-
-@app.get("/kpi/highest_profit_product")
-def get_kpi_highest_profit_product(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return kpis.get_highest_profit_product(db, current_user.id)
-
-@app.get("/kpi/avg_discount")
-def get_kpi_avg_discount(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_avg_discount(db, current_user.id)}
-
-@app.get("/kpi/top_profit_products")
-def get_kpi_top_profit_products(limit: int = 5, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return kpis.get_top_profit_products(db, current_user.id, limit)
-
-@app.get("/kpi/revenue_growth")
-def get_kpi_revenue_growth(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_revenue_growth(db, current_user.id)}
-
-@app.get("/kpi/profit_margin")
-def get_kpi_profit_margin(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_profit_margin(db, current_user.id)}
-
-@app.get("/kpi/avg_order_value")
-def get_kpi_avg_order_value(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_avg_order_value(db, current_user.id)}
-
-@app.get("/kpi/top_category")
-def get_kpi_top_category(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return {"value": kpis.get_top_category(db, current_user.id)}
 
 @app.post("/upload-excel/")
 def upload_excel(
