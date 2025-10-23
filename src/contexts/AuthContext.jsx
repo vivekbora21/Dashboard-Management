@@ -50,6 +50,14 @@ export const AuthProvider = ({ children }) => {
     try {
       setUser(userData);
       setIsAuthenticated(true);
+      // Fetch the user's plan after login
+      const planResponse = await api.get('/user/plan');
+      const plan =
+        planResponse.data.plan?.name ||
+        planResponse.data.plan ||
+        planResponse.data.current_plan ||
+        "free";
+      setUserPlan(plan.toLowerCase());
     } finally {
       setLoggingIn(false);
     }
