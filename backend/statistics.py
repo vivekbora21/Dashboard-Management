@@ -159,3 +159,26 @@ def get_profit_per_product(request: Request, db: Session = Depends(get_db)):
         {"productName": name.capitalize() if name else name, "profit": float(profit or 0)} for name, profit in profit_per_product
     ]
     return profit_per_product_data
+
+@router.get("/total-revenue")
+def get_total_revenue(request: Request, db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+
+    total_revenue = (
+        db.query(
+            func.date_format(models.Product.soldDate, "%Y-%m").label("month"),
+            func.sum(models.Product.sellingPrice * models.Product.quantity).label("revenue")
+        )
+        .filter(models.Product.userId == user.id)
+        .group_by(func.date_format(models.Product.soldDate, "%Y-%m"))
+        .order_by("month")
+        .all()
+    )
+
+    total_revenue_data = [
+        {"month": m, "revenue": float(r or 0)} for m, r in total_revenue
+    ]
+    return total_revenue_data

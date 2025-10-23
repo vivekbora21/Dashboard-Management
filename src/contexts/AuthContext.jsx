@@ -24,6 +24,21 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
+  const refreshPlan = async () => {
+    try {
+      const planResponse = await api.get('/user/plan');
+      const plan =
+        planResponse.data.plan?.name ||
+        planResponse.data.plan ||
+        planResponse.data.current_plan ||
+        "free";
+      setUserPlan(plan.toLowerCase());
+    } catch (error) {
+      console.error('Failed to refresh plan:', error);
+      setUserPlan("free");
+    }
+  };
+
   const checkAuthStatus = async () => {
     try {
       const response = await api.get('/user/profile');
@@ -50,7 +65,6 @@ export const AuthProvider = ({ children }) => {
     try {
       setUser(userData);
       setIsAuthenticated(true);
-      // Fetch the user's plan after login
       const planResponse = await api.get('/user/plan');
       const plan =
         planResponse.data.plan?.name ||
@@ -77,7 +91,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, userPlan, loading, loggingIn, loggingOut, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, userPlan, loading, loggingIn, loggingOut, login, logout, refreshPlan }}>
       {children}
     </AuthContext.Provider>
   );

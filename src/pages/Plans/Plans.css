@@ -36,6 +36,9 @@
   text-align: center;
   animation: fadeInUp 0.8s ease-out;
   position: relative;
+  width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .plans-header::before {
