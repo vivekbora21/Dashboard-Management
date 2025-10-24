@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api';
 import Loading from '../components/Loading';
+import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
@@ -22,7 +23,24 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     checkAuthStatus();
-  }, []);
+    
+    const interceptor = api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401 && isAuthenticated) {
+          toast.error('Your session has expired. Please log in again.');
+          setIsAuthenticated(false);
+          setUser(null);
+          setUserPlan("free");
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      api.interceptors.response.eject(interceptor);
+    };
+  }, [isAuthenticated]);
 
   const refreshPlan = async () => {
     try {
