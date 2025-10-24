@@ -1,14 +1,29 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, status
 from sqlalchemy.orm import Session
 from database import get_db
 from typing import List
 import models
 import auth
 import crud
+import io
 import schemas
+import pandas as pd
+from utils import parse_date
+from datetime import date, datetime
+import validation
 
 
 router = APIRouter(prefix="", tags=["products"])
+MAX_ROWS = 10
+def excel_date_to_date(excel_value):
+    if isinstance(excel_value, datetime):
+        return excel_value.date()
+    elif isinstance(excel_value, date):
+        return excel_value
+    elif isinstance(excel_value, str):
+        return parse_date(excel_value)
+    else:
+        return None
 
 @router.get("/products/")
 def get_products(page: int = 1, limit: int = 10, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
@@ -59,3 +74,66 @@ def get_products_by_date(
 def get_summary(period: str, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     summary = crud.get_summary(db, period, current_user.id)
     return summary
+
+@router.post("/upload-excel/")
+def upload_excel(
+    file: UploadFile = File(...),
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not file.filename.endswith((".xlsx", ".xls")):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only Excel files are allowed.")
+
+    try:
+        df = pd.read_excel(io.BytesIO(file.file.read()))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading Excel file: {str(e)}")
+
+    df = df.head(MAX_ROWS)
+    inserted_products = []
+    for index, row in df.iterrows():
+        try:
+            soldDate = excel_date_to_date(row.get("soldOn"))
+            product_data = models.Product(
+                productName=row.get("productName").capitalize() if row.get("productName") else row.get("productName"),
+                productCategory=row.get("productCategory"),
+                productPrice=float(row.get("productPrice")),
+                sellingPrice=float(row.get("sellingPrice")),
+                quantity=int(row.get("quantity")),
+                userId=current_user.id,
+                ratings=float(row.get("ratings")) if not pd.isna(row.get("ratings")) else None,
+                discounts=row.get("discounts") if not pd.isna(row.get("discounts")) else None,
+                soldDate=soldDate
+            )
+            db.add(product_data)
+            db.commit()
+            db.refresh(product_data)
+            inserted_products.append(product_data)
+        except Exception as e:
+            db.rollback()
+            continue
+
+    return {
+        "message": f"{len(inserted_products)} products inserted successfully",
+        "products": [p.productName for p in inserted_products]
+    }
+
+# Manual Product Update
+@router.post("/manual-update/", response_model=schemas.ProductOut, status_code=status.HTTP_201_CREATED)
+def manual_update(product: schemas.ProductCreate, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+    validation.validate_add_product(product)
+    try:
+        product_dict = product.dict()
+        product_dict['userId'] = current_user.id
+
+        if product_dict.get('soldDate'):
+            try:
+                product_dict['soldDate'] = parse_date(str(product_dict['soldDate']))
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=f"Invalid date format for soldDate: {e}")
+
+        product_with_user = schemas.ProductCreate(**product_dict)
+        new_product = crud.create_product(db, product_with_user)
+        return new_product
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
