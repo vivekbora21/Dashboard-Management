@@ -231,6 +231,62 @@ body {
   margin: 0;
 }
 
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-filter-select {
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 14px;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-filter-select:hover {
+  border-color: #cbd5e0;
+}
+
+.time-filter-select:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+/* Chart Header Styles */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .time-filter {
+    align-self: flex-end;
+  }
+}
+
 @media (max-width: 900px) {
   .statistics-page {
     padding: 20px;

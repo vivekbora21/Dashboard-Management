@@ -1,145 +1,131 @@
-import React, { useState, useEffect, useRef, useMemo, Suspense, lazy,  } from "react";
+import React, { useState, useEffect, useRef, useMemo, lazy } from "react";
 import api from "../../api.js";
 import "./Statistics.css";
 import { FaDownload } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import ChartWrapper from "./components/ChartWrapper";
 
-const SalesTrendChart = lazy(() => import("./components/SalesTrendChart"));
-const DailySalesChart = lazy(() => import("./components/DailySalesChart"));
-const CategoryDistributionChart = lazy(() => import("./components/CategoryDistributionChart"));
-const CategoryPerformanceChart = lazy(() =>import("./components/CategoryPerformanceChart"));
-const ProfitPerProductChart = lazy(() =>import("./components/ProfitPerProductChart"));
-const TopProductsChart = lazy(() => import("./components/TopProductsChart"));
-const ProfitPerCategoryChart = lazy(() =>import("./components/ProfitPerCategoryChart"));
-const AvgRatingsChart = lazy(() => import("./components/AvgRatingsChart"));
+const chartImports = {
+  salesTrend: lazy(() => import("./components/SalesTrendChart")),
+  dailySales: lazy(() => import("./components/DailySalesChart")),
+  categoryDistribution: lazy(() => import("./components/CategoryDistributionChart")),
+  categoryPerformance: lazy(() => import("./components/CategoryPerformanceChart")),
+  profitPerProduct: lazy(() => import("./components/ProfitPerProductChart")),
+  topProducts: lazy(() => import("./components/TopProductsChart")),
+  profitPerCategory: lazy(() => import("./components/ProfitPerCategoryChart")),
+  avgRatings: lazy(() => import("./components/AvgRatingsChart")),
+};
 
-const ChartLoader = () => (
-  <div
-    style={{
-      width: "100%",
-      height: 300,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "#f8fafc",
-      borderRadius: "20px",
-    }}
-  >
-    <div>Loading chart...</div>
-  </div>
-);
+const TIME_PERIODS = { DAY: "day", WEEK: "week", MONTH: "month", YEAR: "year", ALL: "all" };
 
 const Statistics = () => {
   const { userPlan } = useAuth();
-  const [stats, setStats] = useState(null);
-  const statsRef = useRef();
   const navigate = useNavigate();
-  const PLAN_LEVELS = {free: 1, basic: 2, premium: 3};
+  const statsRef = useRef();
+  const [stats, setStats] = useState(null);
+
+  const PLAN_LEVELS = { free: 1, basic: 2, premium: 3 };
+
+  const chartConfig = [
+    { key: "salesTrend", title: "Monthly Sales & Profit Trend", plan: "free" },
+    { key: "dailySales", title: "Daily Sales Count", plan: "free" },
+    { key: "categoryDistribution", title: "Category Distribution", plan: "basic" },
+    { key: "categoryPerformance", title: "Category Performance Comparison", plan: "basic" },
+    { key: "profitPerProduct", title: "Profit per Product", plan: "basic" },
+    { key: "topProducts", title: "Top 5 Selling Products", plan: "premium" },
+    { key: "profitPerCategory", title: "Profit per Category", plan: "premium" },
+    { key: "avgRatings", title: "Average Ratings per Category", plan: "premium" },
+  ];
+
+  const [timeFilters, setTimeFilters] = useState(() =>
+    chartConfig.reduce((acc, c) => {
+      acc[c.key] = TIME_PERIODS.ALL;
+      return acc;
+    }, {})
+  );
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const responses = await Promise.allSettled([
-          api.get("/statistics/sales-trend"),
-          api.get("/statistics/daily-sales"),
-          api.get("/statistics/profit-per-product"),
-          api.get("/statistics/top-products"),
-          api.get("/statistics/profit-per-category"),
-          api.get("/statistics/avg-ratings"),
-          api.get("/statistics/category-distribution"),
-        ]);
-
-        const [
-          salesTrendRes,
-          dailySalesRes,
-          profitPerProductRes,
-          topProductsRes,
-          profitPerCategoryRes,
-          avgRatingsRes,
-          categoryDistributionRes,
-        ] = responses.map((r) =>
-          r.status === "fulfilled" ? r.value : { data: [] }
+        const endpoints = [
+          "sales-trend",
+          "daily-sales",
+          "profit-per-product",
+          "top-products",
+          "profit-per-category",
+          "avg-ratings",
+          "category-distribution",
+        ];
+        const responses = await Promise.allSettled(
+          endpoints.map((ep) => {
+            const key = ep.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+            return api.get(`/statistics/${ep}?period=${timeFilters[key] || "all"}`);
+          })
         );
+        const [salesTrend, dailySales, profitPerProduct, topProducts, profitPerCategory, avgRatings, categoryDistribution] =
+          responses.map((r) => (r.status === "fulfilled" ? r.value.data : []));
 
         setStats({
-          sales_trend: salesTrendRes.data,
-          daily_sales: dailySalesRes.data,
-          profit_per_product: profitPerProductRes.data,
-          top_products: topProductsRes.data,
-          profit_per_category: profitPerCategoryRes.data,
-          avg_ratings: avgRatingsRes.data,
-          category_distribution: categoryDistributionRes.data,
+          sales_trend: salesTrend,
+          daily_sales: dailySales,
+          profit_per_product: profitPerProduct,
+          top_products: topProducts,
+          profit_per_category: profitPerCategory,
+          avg_ratings: avgRatings,
+          category_distribution: categoryDistribution,
         });
       } catch (error) {
         console.error("Error fetching statistics:", error);
       }
     };
-
     fetchStats();
-  }, []);
+  }, [timeFilters]);
 
-  const salesTrendData = useMemo(() => {
-    if (!stats?.sales_trend) return [];
-    return stats.sales_trend.map((item) => ({
-      month: item.month,
-      sales: item.sales,
-      profit: item.profit,
-    }));
-  }, [stats?.sales_trend]);
+  const handleTimeFilterChange = (chartType, period) =>
+    setTimeFilters((prev) => ({ ...prev, [chartType]: period }));
 
-  const dailySalesData = useMemo(() => {
-    if (!stats?.daily_sales) return [];
-    return stats.daily_sales.map((item) => ({
-      soldDate: item.soldDate,
-      quantity: item.quantity,
-    }));
-  }, [stats?.daily_sales]);
-
-  const categoryPerformanceData = useMemo(() => {
-    if (!stats?.category_distribution || !stats?.profit_per_category)
-      return [];
-    return stats.category_distribution.map((cat) => {
-      const profitCat = stats.profit_per_category.find(
-        (p) => p.productCategory === cat.category
-      );
-      return {
+  const mapData = {
+    salesTrend: (d) => d.map((i) => ({ month: i.month, sales: i.sales, profit: i.profit })),
+    dailySales: (d) => d.map((i) => ({ soldDate: i.soldDate, quantity: i.quantity })),
+    categoryPerformance: (d, s) =>
+      s.category_distribution?.map((cat) => ({
         category: cat.category,
         sales: cat.value,
-        profit: profitCat ? profitCat.profit : 0,
-      };
-    });
-  }, [stats?.category_distribution, stats?.profit_per_category]);
+        profit: s.profit_per_category?.find((p) => p.productCategory === cat.category)?.profit || 0,
+      })) || [],
+    default: (d) => d,
+  };
+
+  const processedData = useMemo(() => {
+    if (!stats) return {};
+    return {
+      salesTrend: mapData.salesTrend(stats.sales_trend || []),
+      dailySales: mapData.dailySales(stats.daily_sales || []),
+      categoryPerformance: mapData.categoryPerformance(stats, stats),
+      profitPerProduct: mapData.default(stats.profit_per_product || []),
+      topProducts: mapData.default(stats.top_products || []),
+      profitPerCategory: mapData.default(stats.profit_per_category || []),
+      avgRatings: mapData.default(stats.avg_ratings || []),
+      categoryDistribution: mapData.default(stats.category_distribution || []),
+    };
+  }, [stats]);
 
   const handleDownloadPDF = async () => {
-    const html2canvasPromise = import("html2canvas");
-    const jsPDFPromise = import("jspdf");
-
-    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-      html2canvasPromise,
-      jsPDFPromise,
-    ]);
-
-    const input = statsRef.current;
-    const canvas = await html2canvas(input, {
-      scale: 2, 
-      backgroundColor: "#fff",
-      allowTaint: true,
-    });
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")]);
+    const canvas = await html2canvas(statsRef.current, { scale: 2, backgroundColor: "#fff" });
     const imgData = canvas.toDataURL("image/png");
-
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = 0.95 * ((canvas.height * pdfWidth) / canvas.width);
-
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight * 0.95);
     pdf.save("statistics.pdf");
   };
 
   if (!stats) return <div className="loading">Loading statistics...</div>;
 
-  const hasData = Object.values(stats).some((data) => Array.isArray(data) && data.length > 0);
-  if (!hasData) {
+  const hasData = Object.values(stats).some((d) => Array.isArray(d) && d.length);
+  if (!hasData)
     return (
       <div className="statistics-page">
         <div className="page-heading-container">
@@ -149,11 +135,12 @@ const Statistics = () => {
         <div className="no-data-message">
           <h2>No Products Added Yet</h2>
           <p>Please add some products to view statistics and charts.</p>
-          <button className="add-btn" onClick={() => navigate("/dashboard/addproduct")}>Add Product</button>
+          <button className="add-btn" onClick={() => navigate("/dashboard/addproduct")}>
+            Add Product
+          </button>
         </div>
       </div>
     );
-  }
 
   return (
     <div className="statistics-page">
@@ -167,149 +154,21 @@ const Statistics = () => {
       </button>
 
       <div className="chart-grid" ref={statsRef}>
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Monthly Sales & Profit Trend</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <SalesTrendChart data={salesTrendData} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Free Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Daily Sales Count</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <DailySalesChart data={dailySalesData} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['free'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Free Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Category Distribution</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <CategoryDistributionChart data={stats.category_distribution} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Basic Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Category Performance Comparison</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <CategoryPerformanceChart data={categoryPerformanceData} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Basic Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Profit per Product</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <ProfitPerProductChart data={stats.profit_per_product} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['basic'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Basic Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Top 5 Selling Products</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <TopProductsChart data={stats.top_products} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Premium Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Profit per Category</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <ProfitPerCategoryChart data={stats.profit_per_category} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Premium Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`chart-wrapper ${PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] ? 'locked' : ''}`}>
-          <div className="chart-card">
-            <h3>Average Ratings per Category</h3>
-            <Suspense fallback={<ChartLoader />}>
-              <AvgRatingsChart data={stats.avg_ratings} />
-            </Suspense>
-          </div>
-          {PLAN_LEVELS[userPlan] < PLAN_LEVELS['premium'] && (
-            <div className="lock-overlay">
-              <div className="lock-icon">🔒</div>
-              <p>Upgrade to Premium Plan</p>
-              <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
-                Upgrade Now
-              </button>
-            </div>
-          )}
-        </div>
+        {chartConfig.map(({ key, title, plan }) => {
+          const ChartComponent = chartImports[key];
+          return (
+            <ChartWrapper
+              key={key}
+              title={title}
+              chartType={key}
+              currentFilter={timeFilters[key]}
+              onTimeFilterChange={handleTimeFilterChange}
+              requiredPlan={plan}
+            >
+              <ChartComponent data={processedData[key]} timeFilter={timeFilters[key]} />
+            </ChartWrapper>
+          );
+        })}
       </div>
     </div>
   );

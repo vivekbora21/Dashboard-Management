@@ -5,9 +5,11 @@ import './Products.css';
 import { AiFillDelete } from 'react-icons/ai';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { FaList } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import ConfirmationModal from '../../components/ConfirmationModal';
 
 const Products = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -124,6 +126,23 @@ const Products = () => {
 
   if (loading) {
     return <div className="loading">Loading products...</div>;
+  }
+
+  if (totalProducts === 0) {
+    return (
+      <div className="products-container">
+        <div className="page-heading-container">
+          <h1><FaList/>  Products</h1>
+        </div>
+        <div className="no-data-message">
+          <h2>No Products Added Yet</h2>
+          <p>Please add some products to view them here.</p>
+          <button className="add-btn" onClick={() => navigate("/dashboard/addproduct")}>
+            Add Product
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
