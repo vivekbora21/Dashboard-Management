@@ -9,7 +9,7 @@
 /* ============ SIDEBAR ============ */
 .sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, #fafaff, #e5e5f6);
   padding: 30px 20px;
   border-right: 1px solid rgba(102, 126, 234, 0.1);
   display: flex;

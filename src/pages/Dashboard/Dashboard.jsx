@@ -5,6 +5,7 @@ import './Dashboard.css';
 import StatCard from "../../components/StatCard.jsx";
 import Loading from "../../components/Loading";
 import { useAuth } from '../../contexts/AuthContext';
+import { abbreviateNumber, formatCurrency } from '../../utils/numberUtils';
 
 const Dashboard = () => {
   const { userPlan } = useAuth();
@@ -108,14 +109,14 @@ const Dashboard = () => {
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
 
   const statItems = [
-  { icon: "💰", title: "Total Sales", value: `₹ ${(stats.totalSales || 0).toLocaleString('en-IN')}`, minPlan: 'free'},
-  { icon: "📈", title: "Total Profit", value: `₹ ${(stats.totalProfit || 0).toLocaleString('en-IN')}`, minPlan: 'free' },
+  { icon: "💰", title: "Total Sales", value: `₹ ${abbreviateNumber(stats.totalSales || 0)}`, fullValue: formatCurrency(stats.totalSales || 0), minPlan: 'free'},
+  { icon: "📈", title: "Total Profit", value: `₹ ${abbreviateNumber(stats.totalProfit || 0)}`, fullValue: formatCurrency(stats.totalProfit || 0), minPlan: 'free' },
   { icon: "📦", title: "Total Orders", value: `${(stats.totalOrders || 0).toLocaleString('en-IN')}`, minPlan: 'free' },
   { icon: "📊", title: "Total Quantity", value: `${(stats.totalQuantity || 0).toLocaleString('en-IN')}`, minPlan: 'free' },
   { icon: "⭐", title: "Average Rating", value: `${(stats.avgRating || 0).toFixed(1)}/5`, minPlan: 'basic' },
-  { icon: "🛒", title: "Average Order Value", value: `₹ ${(stats.avgOrderValue || 0).toLocaleString('en-IN')}`, minPlan: 'basic' },
+  { icon: "🛒", title: "Average Order Value", value: `₹ ${abbreviateNumber(stats.avgOrderValue || 0)}`, fullValue: formatCurrency(stats.avgOrderValue || 0), minPlan: 'basic' },
   { icon: "🏬", title: "Top Category", value: stats.topCategory || "N/A", minPlan: 'basic' },
-  { icon: "💸", title: "Avg Discount Given", value: `₹ ${(stats.avgDiscount || 0).toLocaleString('en-IN')}`, minPlan: 'basic' },
+  { icon: "💸", title: "Avg Discount Given", value: `₹ ${abbreviateNumber(stats.avgDiscount || 0)}`, fullValue: formatCurrency(stats.avgDiscount || 0), minPlan: 'basic' },
   { icon: "🔥", title: "Top Selling Product", value: stats.highestSellingProduct?.productName || "N/A", minPlan: 'premium' },
   { icon: "🏆", title: "Top Profit Product", value: stats.highestProfitProduct?.productName || "N/A", minPlan: 'premium' },
   { icon: "📊", title: "Profit Margin", value: `${(stats.profitMargin || 0).toFixed(2)}%`, minPlan: 'premium' },
@@ -140,7 +141,7 @@ const Dashboard = () => {
             const hasAccess = PLAN_LEVELS[userPlan] >= PLAN_LEVELS[item.minPlan];
             return (
               <div key={index} className={`card-wrapper ${!hasAccess ? 'locked' : ''}`}>
-                <StatCard icon={item.icon} title={item.title} value={item.value} />
+                <StatCard icon={item.icon} title={item.title} value={item.value} fullValue={item.fullValue} />
                 {!hasAccess && (
                   <div className="lock-overlay">
                     <span className="lock-icon">🔒</span>

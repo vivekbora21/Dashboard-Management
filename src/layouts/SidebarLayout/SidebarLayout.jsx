@@ -71,8 +71,7 @@ const SidebarLayout = () => {
         <div className="login-dtl">
           {!isCollapsed && (
             <>
-              <div>Logged In as:
-              <div className="user-name">{user ? `${user.firstName} ${user.lastName}` : 'Loading...'}</div></div>
+              <div className="user-name">User: {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}</div>
             </>
           )}
         </div>
