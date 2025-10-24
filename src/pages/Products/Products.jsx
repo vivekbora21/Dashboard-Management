@@ -7,6 +7,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { FaList } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ConfirmationModal from '../../components/ConfirmationModal';
+import Loading from '../../components/Loading';
 
 const Products = () => {
   const navigate = useNavigate();
@@ -125,7 +126,7 @@ const Products = () => {
   };
 
   if (loading) {
-    return <div className="loading">Loading products...</div>;
+    return <Loading overlay />;
   }
 
   if (totalProducts === 0) {

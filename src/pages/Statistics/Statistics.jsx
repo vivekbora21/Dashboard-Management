@@ -5,6 +5,7 @@ import { FaDownload } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import ChartWrapper from "./components/ChartWrapper";
+import Loading from "../../components/Loading";
 
 const chartImports = {
   salesTrend: lazy(() => import("./components/SalesTrendChart")),
@@ -122,7 +123,7 @@ const Statistics = () => {
     pdf.save("statistics.pdf");
   };
 
-  if (!stats) return <div className="loading">Loading statistics...</div>;
+  if (!stats) return <Loading overlay />;
 
   const hasData = Object.values(stats).some((d) => Array.isArray(d) && d.length);
   if (!hasData)

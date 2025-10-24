@@ -5,6 +5,7 @@ import api from '../../api';
 import './Profile.css';
 import { FaUserEdit, FaEdit, FaTimes } from 'react-icons/fa';
 import ProfileField from '../../components/ProfileField';
+import Loading from '../../components/Loading';
 
 const Profile = () => {
   const [user, setUser] = useState({
@@ -137,11 +138,7 @@ const Profile = () => {
   };
 
   if (loading) {
-    return (
-      <div className='customers-content'>
-        <p>Loading...</p>
-      </div>
-    );
+    return <Loading overlay />;
   }
 
   return (

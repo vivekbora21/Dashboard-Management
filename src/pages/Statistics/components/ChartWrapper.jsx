@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
+import Loading from "../../../components/Loading";
 
 const ChartLoader = () => (
   <div
@@ -14,7 +15,7 @@ const ChartLoader = () => (
       borderRadius: "20px",
     }}
   >
-    <div>Loading chart...</div>
+    <Loading />
   </div>
 );
 

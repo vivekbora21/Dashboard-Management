@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './components/AppStyle.css';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import Loading from './components/Loading';
 
 const Signup = lazy(() => import('./pages/Signup/Signup'));
 const Login = lazy(() => import('./pages/Login/Login'));
@@ -23,7 +24,7 @@ const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 function App() {
   return (
     <Router>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Loading overlay />}>
         <Routes>
           <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
