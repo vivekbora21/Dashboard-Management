@@ -2,6 +2,9 @@ from fastapi import FastAPI, Depends, HTTPException, status, Response, Request, 
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
+from database import engine, get_db
+from utils import parse_date
+from routers.plans_router import router as plans_router
 from typing import List
 import pandas as pd
 from datetime import datetime, date
@@ -12,37 +15,23 @@ import otp_utils
 import email_utils
 import io
 import crud
-from database import engine, get_db
-from utils import parse_date
-from statistics import router as statistics_router
-from routers.plans_router import router as plans_router
-import kpis
-import users
+import routers.kpis as kpis
+import routers.users as users
 import validation
 import os
+import routers.plans as plans
+import routers.products as products
+import routers.statistics as statistics
 
 app = FastAPI(title="Sales Manager API")
-app.include_router(statistics_router)
+app.include_router(statistics.router)
 app.include_router(plans_router)
 app.include_router(kpis.router)
 app.include_router(users.router)
+app.include_router(plans.router)
+app.include_router(products.router)
 models.Base.metadata.create_all(bind=engine)
 MAX_ROWS = 10
-
-def get_current_user(request: Request, db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    token = auth.get_token_from_cookie(request)
-    if not token:
-        raise credentials_exception
-    email = auth.verify_token(token, credentials_exception)
-    user = db.query(models.User).filter(models.User.email == email).first()
-    if user is None:
-        raise credentials_exception
-    return user
 
 def excel_date_to_date(excel_value):
     if isinstance(excel_value, datetime):
@@ -104,7 +93,7 @@ def login(user: schemas.UserLogin, response: Response, db: Session = Depends(get
 
 # Manual Product Update
 @app.post("/manual-update/", response_model=schemas.ProductOut, status_code=status.HTTP_201_CREATED)
-def manual_update(product: schemas.ProductCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+def manual_update(product: schemas.ProductCreate, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     validation.validate_add_product(product)
     try:
         product_dict = product.dict()
@@ -122,67 +111,16 @@ def manual_update(product: schemas.ProductCreate, current_user: models.User = De
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# Get all products
-@app.get("/products/")
-def get_products(page: int = 1, limit: int = 10, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    products, total = crud.get_products_paginated(db, current_user.id, page, limit)
-    return {"products": products, "total": total, "page": page, "limit": limit}
-
-# Get stats
-@app.get("/stats/")
-def get_stats(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return crud.get_stats(db, current_user.id)
-
-# Update product
-@app.put("/products/{product_id}", response_model=schemas.ProductOut)
-def update_product(
-    product_id: int,
-    product: schemas.ProductCreate,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    updated_product = crud.update_product(db, product_id, product, current_user.id)
-    if not updated_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return updated_product
-
-# Delete product
-@app.delete("/products/{product_id}")
-def delete_product(
-    product_id: int,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    success = crud.delete_product(db, product_id, current_user.id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return {"message": "Product deleted successfully"}
-
 # Logout
 @app.post("/logout/")
 def logout(response: Response):
     response.delete_cookie(key="access_token")
     return {"message": "Logged out successfully"}
 
-# Get products by date
-@app.get("/products/date/{date}", response_model=List[schemas.ProductOut])
-def get_products_by_date(
-    date: str,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    products = crud.get_products_by_date(db, date, current_user.id)
-    return products
-
-@app.get("/products/summary")
-def get_summary(period: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    summary = crud.get_summary(db, period, current_user.id)
-    return summary
-
 @app.post("/upload-excel/")
 def upload_excel(
     file: UploadFile = File(...),
-    current_user: models.User = Depends(get_current_user),
+    current_user: models.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
     if not file.filename.endswith((".xlsx", ".xls")):
@@ -279,12 +217,3 @@ def reset_password(request: dict, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Password reset successfully"}
-
-@app.get("/user/plan")
-def get_user_plan(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    current_plan = crud.get_user_current_plan(db, current_user.id)
-    print("Current plan fetched:", current_plan)
-    if current_plan:
-        return {"plan": current_plan["name"]}
-    else:
-        return {"plan": "free"}
