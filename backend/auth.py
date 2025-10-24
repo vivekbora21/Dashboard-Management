@@ -2,7 +2,9 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import Request
+from fastapi import Request, HTTPException, status, Depends
+from sqlalchemy.orm import Session
+from database import get_db
 import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -42,8 +44,12 @@ def verify_token(token: str, credentials_exception):
     except JWTError:
         raise credentials_exception
 
-def get_current_user(request: Request, db):
-    credentials_exception = Exception("Could not validate credentials")
+def get_current_user(request: Request, db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     token = get_token_from_cookie(request)
     if not token:
         raise credentials_exception

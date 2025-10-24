@@ -17,6 +17,7 @@ from utils import parse_date
 from statistics import router as statistics_router
 from routers.plans_router import router as plans_router
 import kpis
+import users
 import validation
 import os
 
@@ -24,6 +25,7 @@ app = FastAPI(title="Sales Manager API")
 app.include_router(statistics_router)
 app.include_router(plans_router)
 app.include_router(kpis.router)
+app.include_router(users.router)
 models.Base.metadata.create_all(bind=engine)
 MAX_ROWS = 10
 
@@ -161,20 +163,6 @@ def delete_product(
 def logout(response: Response):
     response.delete_cookie(key="access_token")
     return {"message": "Logged out successfully"}
-
-# Get user profile
-@app.get("/user/profile", response_model=schemas.UserOut)
-def get_user_profile(current_user: models.User = Depends(get_current_user)):
-    return current_user
-
-# Update user profile
-@app.put("/user/profile", response_model=schemas.UserOut)
-def update_user_profile(user: schemas.UserUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    validation.validate_update_user(db, current_user.id, user)
-    updated_user = crud.update_user(db, current_user.id, user)
-    if not updated_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return updated_user
 
 # Get products by date
 @app.get("/products/date/{date}", response_model=List[schemas.ProductOut])
