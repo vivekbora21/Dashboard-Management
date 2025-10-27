@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from auth import get_current_user
-from database import get_db
-import crud
+from database.database import get_db
+import database.crud as crud
 import models
 
 

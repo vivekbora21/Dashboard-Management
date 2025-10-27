@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from auth import get_current_user
 import validation
-import crud
-from database import get_db
+import database.crud as crud
+from database.database import get_db
 import schemas
 import models
 

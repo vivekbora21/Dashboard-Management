@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, status
 from sqlalchemy.orm import Session
-from database import get_db
+from database.database import get_db
 from typing import List
 import models
 import auth
-import crud
+import database.crud as crud
 import io
 import schemas
 import pandas as pd

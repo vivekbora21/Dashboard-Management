@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, status, Response
 import schemas
 import auth
 from sqlalchemy.orm import Session
-from database import get_db
+from database.database import get_db
 import models
 import validation
-import crud
+import database.crud as crud
 
 router = APIRouter(prefix="", tags=["users"])
 

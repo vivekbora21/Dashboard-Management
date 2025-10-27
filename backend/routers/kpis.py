@@ -4,7 +4,7 @@ import models
 from datetime import datetime, timedelta
 from auth import get_current_user
 from fastapi import Depends, APIRouter, Request, HTTPException
-from database import get_db
+from database.database import get_db
 
 router = APIRouter(prefix="", tags=["kpi"])
 

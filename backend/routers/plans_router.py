@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List
 import models
 import schemas
-import crud
+import database.crud as crud
 from auth import get_current_user
-from database import get_db
+from database.database import get_db
 
 router = APIRouter(prefix="", tags=["plan"])
 

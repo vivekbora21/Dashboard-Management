@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import Request, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from database.database import get_db
 import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

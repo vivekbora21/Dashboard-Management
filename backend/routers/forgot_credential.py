@@ -4,7 +4,7 @@ import models
 import auth
 import otp_utils
 import email_utils
-from database import get_db
+from database.database import get_db
 
 router = APIRouter(prefix="", tags=["Forgot Credential"])
 

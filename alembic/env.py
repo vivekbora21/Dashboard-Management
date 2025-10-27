@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 import backend.models 
-from backend.database import Base
+from backend.database.database import Base
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context

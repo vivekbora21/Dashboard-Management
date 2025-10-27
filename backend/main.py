@@ -1,8 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Response
-from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import engine, get_db
+from database.database import engine
 from routers.plans_router import router as plans_router
 import models
 import routers.kpis as kpis
@@ -14,6 +12,7 @@ import routers.user as user
 import routers.forgot_credential as forgot_credential
 
 app = FastAPI(title="Sales Manager API")
+
 app.include_router(statistics.router)
 app.include_router(plans_router)
 app.include_router(kpis.router)
