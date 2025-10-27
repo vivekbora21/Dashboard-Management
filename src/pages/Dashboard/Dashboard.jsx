@@ -145,6 +145,7 @@ const Dashboard = () => {
                 {!hasAccess && (
                   <div className="lock-overlay">
                     <span className="lock-icon">🔒</span>
+                    <p>{item.title}</p>
                     <p>Upgrade to {item.minPlan.charAt(0).toUpperCase() + item.minPlan.slice(1)}</p>
                     <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
                       Upgrade Now

@@ -62,6 +62,7 @@ const ChartWrapper = ({
       </div>
       {PLAN_LEVELS[userPlan] < PLAN_LEVELS[requiredPlan] && (
         <div className="lock-overlay">
+          <p><h2>{title}</h2></p>
           <div className="lock-icon">🔒</div>
           <p>Upgrade to {requiredPlan.charAt(0).toUpperCase() + requiredPlan.slice(1)} Plan</p>
           <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
