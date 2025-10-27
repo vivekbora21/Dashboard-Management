@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 import models.models as models
 from database.database import get_db
-from auth import get_current_user
+from auth.auth import get_current_user
 from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/statistics", tags=["Statistics"])

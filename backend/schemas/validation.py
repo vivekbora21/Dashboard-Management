@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 import models.models as models
-import auth
+import auth.auth as auth
 
 def validate_signup(db: Session, user):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()

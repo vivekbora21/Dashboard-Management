@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, Response
 import schemas.schemas as schemas
-import auth
+import auth.auth as auth
 from sqlalchemy.orm import Session
 from database.database import get_db
 import models.models as models

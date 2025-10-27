@@ -4,7 +4,7 @@ from typing import List
 import models.models as models
 import schemas.schemas as schemas
 import database.crud as crud
-from auth import get_current_user
+from auth.auth import get_current_user
 from database.database import get_db
 
 router = APIRouter(prefix="", tags=["plan"])

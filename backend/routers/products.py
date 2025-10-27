@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from typing import List
 import models.models as models
-import auth
+import auth.auth as auth
 import database.crud as crud
 import io
 import schemas.schemas as schemas

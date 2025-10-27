@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 import models.models as models
 from datetime import datetime, timedelta
-from auth import get_current_user
+from auth.auth import get_current_user
 from fastapi import Depends, APIRouter, Request, HTTPException
 from database.database import get_db
 
