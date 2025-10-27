@@ -202,7 +202,7 @@ tr:hover td {
   transition: all 0.4s ease;
 }
 
-.card-wrapper.locked .stat-card {
+.card-wrapper.dashboard-locked .stat-card {
   filter: blur(2px) brightness(0.7) saturate(0.8);
   pointer-events: none;
   transform: scale(0.98);
@@ -247,8 +247,8 @@ tr:hover td {
   color: #ffffff;
   border: none;
   border-radius: 30px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 400;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
   transition: background 0.3s ease, transform 0.2s ease;

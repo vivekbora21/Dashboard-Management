@@ -113,7 +113,25 @@ const Statistics = () => {
   }, [stats]);
 
   const handleDownloadPDF = async () => {
-    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")]);
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+      import("html2canvas"),
+      import("jspdf"),
+    ]);
+
+    const userLevel = PLAN_LEVELS[userPlan] || PLAN_LEVELS.free;
+
+    const chartElements = Array.from(statsRef.current.querySelectorAll(".chart-wrapper"));
+    const hiddenCharts = [];
+
+    chartElements.forEach((chartEl, index) => {
+      const requiredPlan = chartConfig[index].plan;
+      const requiredLevel = PLAN_LEVELS[requiredPlan];
+      if (requiredLevel > userLevel) {
+        chartEl.style.display = "none";
+        hiddenCharts.push(chartEl);
+      }
+    });
+
     const canvas = await html2canvas(statsRef.current, { scale: 2, backgroundColor: "#fff" });
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
@@ -121,7 +139,12 @@ const Statistics = () => {
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight * 0.95);
     pdf.save("statistics.pdf");
+
+    hiddenCharts.forEach((chartEl) => {
+      chartEl.style.display = "";
+    });
   };
+
 
   if (!stats) return <Loading overlay />;
 

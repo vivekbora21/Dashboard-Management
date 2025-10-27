@@ -126,6 +126,10 @@ body {
   margin-bottom: 30px;
 }
 
+.chart-wrapper.locked .chart-card {
+  filter: blur(10px);
+}
+
 .chart-card {
   background: #ffffff;
   padding: 25px;
@@ -133,8 +137,7 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
   border: 1px solid rgba(255,255,255,0.2);
-  min-height: 350px; /* Adjusted height to prevent CLS and improve display */
-  /* animation: slideIn 0.8s ease-out; */
+  min-height: 350px; 
 }
 
 .lock-overlay {

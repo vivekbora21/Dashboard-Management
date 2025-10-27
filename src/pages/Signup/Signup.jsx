@@ -115,7 +115,6 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (validateForm()) {
       setSubmitting(true);
       try {
@@ -136,8 +135,7 @@ const Signup = () => {
       setTouched({});
       navigate('/login');
       } catch (error) {
-        console.log(error.response?.data);
-        toast.error("Error during signup: " + (error.response?.data?.detail || error.message));
+        toast.error((error.response?.data?.detail || error.message));
       } finally {
         setSubmitting(false);
       }
@@ -147,7 +145,6 @@ const Signup = () => {
   return (
     <div className="signup-auth-container">
       <h1>Create an Account</h1>
-
       <form onSubmit={handleSubmit} noValidate ref={inputRef}>
         <div className="signup-form-row">
           <div className="signup-form-group">

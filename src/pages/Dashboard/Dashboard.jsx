@@ -140,12 +140,12 @@ const Dashboard = () => {
           statItems.map((item, index) => {
             const hasAccess = PLAN_LEVELS[userPlan] >= PLAN_LEVELS[item.minPlan];
             return (
-              <div key={index} className={`card-wrapper ${!hasAccess ? 'locked' : ''}`}>
+              <div key={index} className={`card-wrapper ${!hasAccess ? 'dashboard-locked' : ''}`}>
                 <StatCard icon={item.icon} title={item.title} value={item.value} fullValue={item.fullValue} />
                 {!hasAccess && (
                   <div className="lock-overlay">
-                    <span className="lock-icon">🔒</span>
                     <p>{item.title}</p>
+                    <span className="lock-icon">🔒</span>
                     <p>Upgrade to {item.minPlan.charAt(0).toUpperCase() + item.minPlan.slice(1)}</p>
                     <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
                       Upgrade Now
