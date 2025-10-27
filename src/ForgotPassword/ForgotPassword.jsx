@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import api from '../../api';
+import api from '../api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import './ForgotPassword.css'; // Assuming you have a CSS file
+import './ForgotPassword.css';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
