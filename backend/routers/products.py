@@ -6,11 +6,11 @@ import models.models as models
 import auth
 import database.crud as crud
 import io
-import schemas
+import schemas.schemas as schemas
 import pandas as pd
 from utilities.utils import parse_date
 from datetime import date, datetime
-import validation
+import schemas.validation as validation
 
 
 router = APIRouter(prefix="", tags=["products"])

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 import models.models as models
-import schemas
+import schemas.schemas as schemas
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 from utilities.utils import parse_date
