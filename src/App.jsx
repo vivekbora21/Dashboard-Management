@@ -9,7 +9,7 @@ import Loading from './components/Loading';
 
 const Signup = lazy(() => import('./pages/Signup/Signup'));
 const Login = lazy(() => import('./pages/Login/Login'));
-const ForgotPassword = lazy(() => import('./ForgotPassword/ForgotPassword'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword/ForgotPassword'));
 const VerifyOTP = lazy(() => import('./pages/VerifyOTP/VerifyOTP'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
