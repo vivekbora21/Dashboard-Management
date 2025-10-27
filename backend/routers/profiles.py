@@ -8,7 +8,7 @@ import schemas
 import models
 
 
-router = APIRouter(prefix="", tags=["user"])
+router = APIRouter(prefix="", tags=["Profile"])
 
 @router.get("/user/profile", response_model=schemas.UserOut)
 def get_user_profile(current_user: models.User = Depends(get_current_user)):
