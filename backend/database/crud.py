@@ -3,9 +3,9 @@ import models
 import schemas
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
-from utils import parse_date
+from utilities.utils import parse_date
 from datetime import datetime, timedelta
-from sqlalchemy import func, extract
+from sqlalchemy import func
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -24,7 +24,6 @@ def create_user(db: Session, user: schemas.UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        # Assign free plan (id=1) by default via subscription
         create_subscription(db, db_user.id, 1)
         return db_user
     except IntegrityError:

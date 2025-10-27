@@ -8,7 +8,7 @@ import database.crud as crud
 import io
 import schemas
 import pandas as pd
-from utils import parse_date
+from utilities.utils import parse_date
 from datetime import date, datetime
 import validation
 
