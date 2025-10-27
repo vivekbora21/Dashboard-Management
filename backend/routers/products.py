@@ -89,13 +89,95 @@ def upload_excel(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error reading Excel file: {str(e)}")
 
+    # Validate required columns
+    required_columns = ["productName", "productCategory", "productPrice", "sellingPrice", "quantity"]
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        raise HTTPException(status_code=400, detail=f"Missing required columns: {', '.join(missing_columns)}")
+
     df = df.head(MAX_ROWS)
+    errors = []
+    for index, row in df.iterrows():
+        row_errors = []
+        row_num = index + 2  # Assuming header is row 1, data starts at row 2
+
+        # Validate productName
+        product_name = row.get("productName")
+        if pd.isna(product_name) or not str(product_name).strip():
+            row_errors.append("productName is required")
+
+        # Validate productCategory
+        product_category = row.get("productCategory")
+        if pd.isna(product_category) or not str(product_category).strip():
+            row_errors.append("productCategory is required")
+
+        # Validate productPrice
+        product_price = row.get("productPrice")
+        if pd.isna(product_price):
+            row_errors.append("productPrice is required")
+        else:
+            try:
+                price = float(product_price)
+                if price <= 0:
+                    row_errors.append("productPrice must be greater than 0")
+            except ValueError:
+                row_errors.append("productPrice must be a valid number")
+
+        # Validate sellingPrice
+        selling_price = row.get("sellingPrice")
+        if pd.isna(selling_price):
+            row_errors.append("sellingPrice is required")
+        else:
+            try:
+                sell_price = float(selling_price)
+                if sell_price <= 0:
+                    row_errors.append("sellingPrice must be greater than 0")
+                elif not pd.isna(product_price) and sell_price < float(product_price):
+                    row_errors.append("sellingPrice must be greater than or equal to productPrice")
+            except ValueError:
+                row_errors.append("sellingPrice must be a valid number")
+
+        # Validate quantity
+        quantity = row.get("quantity")
+        if pd.isna(quantity):
+            row_errors.append("quantity is required")
+        else:
+            try:
+                qty = int(quantity)
+                if qty <= 0:
+                    row_errors.append("quantity must be greater than 0")
+            except ValueError:
+                row_errors.append("quantity must be a valid integer")
+
+        # Validate ratings (optional)
+        ratings = row.get("ratings")
+        if not pd.isna(ratings):
+            try:
+                rating = float(ratings)
+                if rating < 0 or rating > 5:
+                    row_errors.append("ratings must be between 0 and 5")
+            except ValueError:
+                row_errors.append("ratings must be a valid number")
+
+        # Validate soldDate (optional)
+        sold_date = row.get("soldOn")
+        if not pd.isna(sold_date):
+            if excel_date_to_date(sold_date) is None:
+                row_errors.append("soldOn must be a valid date")
+
+        if row_errors:
+            errors.append(f"Row {row_num}: {', '.join(row_errors)}")
+
+    if errors:
+        raise HTTPException(status_code=400, detail="Validation errors found in Excel file:\n" + "\n".join(errors))
+
+    # If validation passes, insert products
     inserted_products = []
     for index, row in df.iterrows():
         try:
             soldDate = excel_date_to_date(row.get("soldOn"))
             product_data = models.Product(
-                productName=row.get("productName").capitalize() if row.get("productName") else row.get("productName"),
+                productName=str(row.get("productName")).capitalize() if row.get("productName") else str(row.get("productName")),
                 productCategory=row.get("productCategory"),
                 productPrice=float(row.get("productPrice")),
                 sellingPrice=float(row.get("sellingPrice")),
@@ -111,7 +193,7 @@ def upload_excel(
             inserted_products.append(product_data)
         except Exception as e:
             db.rollback()
-            continue
+            raise HTTPException(status_code=500, detail=f"Error inserting product at row {index + 2}: {str(e)}")
 
     return {
         "message": f"{len(inserted_products)} products inserted successfully",
