@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-import models
+import models.models as models
 import schemas
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database.database import engine
 from routers.plans_router import router as plans_router
-import models
+import models.models as models
 import routers.kpis as kpis
 import routers.profiles as profiles
 import routers.plans as plans

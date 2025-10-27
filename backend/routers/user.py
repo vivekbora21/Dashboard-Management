@@ -3,7 +3,7 @@ import schemas
 import auth
 from sqlalchemy.orm import Session
 from database.database import get_db
-import models
+import models.models as models
 import validation
 import database.crud as crud
 

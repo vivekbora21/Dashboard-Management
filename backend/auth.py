@@ -5,7 +5,7 @@ from typing import Optional
 from fastapi import Request, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from database.database import get_db
-import models
+import models.models as models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

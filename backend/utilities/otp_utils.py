@@ -1,7 +1,7 @@
 import random
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from models import OTP
+from models.models import OTP
 
 def generate_otp():
     return str(random.randint(100000, 999999))

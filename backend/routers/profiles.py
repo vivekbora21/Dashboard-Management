@@ -5,7 +5,7 @@ import validation
 import database.crud as crud
 from database.database import get_db
 import schemas
-import models
+import models.models as models
 
 
 router = APIRouter(prefix="", tags=["Profile"])

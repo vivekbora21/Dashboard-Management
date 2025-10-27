@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from auth import get_current_user
 from database.database import get_db
 import database.crud as crud
-import models
+import models.models as models
 
 
 router = APIRouter(prefix="", tags=["User_plan"])
