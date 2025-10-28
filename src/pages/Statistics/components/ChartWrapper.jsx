@@ -65,7 +65,7 @@ const ChartWrapper = ({
           <p><h2>{title}</h2></p>
           <div className="lock-icon">🔒</div>
           <p>Upgrade to {requiredPlan.charAt(0).toUpperCase() + requiredPlan.slice(1)} Plan</p>
-          <button className="upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
+          <button className="plan-upgrade-btn" onClick={() => navigate("/dashboard/plans")}>
             Upgrade Now
           </button>
         </div>

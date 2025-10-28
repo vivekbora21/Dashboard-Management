@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import api from "../../api.js";
+import api, { getUserPlan } from "../../api.js";
 import "./AddProduct.css";
 import { MdDriveFolderUpload } from 'react-icons/md';
 import Loading from "../../components/Loading";
@@ -13,6 +13,8 @@ const AddProduct = () => {
   const [showUploadControls, setShowUploadControls] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [userPlan, setUserPlan] = useState("free");
+  const [uploadLimit, setUploadLimit] = useState(5);
 
 
   const [formData, setFormData] = useState({
@@ -28,6 +30,23 @@ const AddProduct = () => {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+
+  useEffect(() => {
+    const fetchUserPlan = async () => {
+      try {
+        const res = await getUserPlan();
+        const plan = res.plan;
+        setUserPlan(plan);
+        const limits = { Free: 5, Basic: 15, Premium: 50 };
+        setUploadLimit(limits[plan] || 5);
+      } catch (err) {
+        console.error("Failed to fetch user plan:", err);
+        setUserPlan("free");
+        setUploadLimit(5);
+      }
+    };
+    fetchUserPlan();
+  }, []);
 
   const validateField = (name, value) => {
     let error = "";
@@ -185,7 +204,7 @@ const AddProduct = () => {
           }}
         >
           📁 Upload Products
-          <p>Add upto 10 data at once</p>
+          <p>Add upto {uploadLimit} data at once</p>
         </div>
         <div
           className="card-option"
@@ -207,7 +226,7 @@ const AddProduct = () => {
             <h4>How to Upload Products:</h4>
             <ol>
               <li>Download the sample Excel file using the <a href="/Sample.xlsx">link</a> below.</li>
-              <li>Open the file and fill in details for up to 10 products. Do not exceed 10 products.</li>
+              <li>Open the file and fill in details for up to {uploadLimit} products. Do not exceed {uploadLimit} products.</li>
               <li>Save the file and select it using the file input below.</li>
               <li>Click the "Upload" button to submit your products.</li>
             </ol>

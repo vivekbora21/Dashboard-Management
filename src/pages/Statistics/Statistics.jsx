@@ -104,7 +104,7 @@ const Statistics = () => {
       }
     };
     fetchStats();
-  }, [timeFilters]);
+  }, [timeFilters, userPlan]);
 
   const handleTimeFilterChange = (chartType, period) =>
     setTimeFilters((prev) => ({ ...prev, [chartType]: period }));

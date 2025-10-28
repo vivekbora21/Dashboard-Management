@@ -14,7 +14,7 @@ import schemas.validation as validation
 
 
 router = APIRouter(prefix="", tags=["products"])
-MAX_ROWS = 10
+
 def excel_date_to_date(excel_value):
     if isinstance(excel_value, datetime):
         return excel_value.date()
@@ -95,11 +95,20 @@ def upload_excel(
     if missing_columns:
         raise HTTPException(status_code=400, detail=f"Missing required columns: {', '.join(missing_columns)}")
 
-    df = df.head(MAX_ROWS)
+    # Get user's current plan to determine row limit
+    user_plan = crud.get_user_current_plan(db, current_user.id)
+    plan_name = user_plan["name"] if user_plan else "free"
+    row_limits = {"Free": 5, "Basic": 15, "Premium": 50}
+    max_rows = row_limits.get(plan_name, 5)  
+
+    if len(df) > max_rows:
+        raise HTTPException(status_code=400, detail=f"Upload limit exceeded. Your {plan_name} plan allows up to {max_rows} rows per upload.")
+
+    df = df.head(max_rows)
     errors = []
     for index, row in df.iterrows():
         row_errors = []
-        row_num = index + 2  # Assuming header is row 1, data starts at row 2
+        row_num = index + 2 
 
         # Validate productName
         product_name = row.get("productName")

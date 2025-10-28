@@ -103,7 +103,7 @@ const Dashboard = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [fetchStats, fetchTopProducts]);
+  }, [fetchStats, fetchTopProducts, userPlan]);
 
   const formattedDateTime = currentDateTime.toLocaleDateString('en-US',
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + currentDateTime.toLocaleTimeString();
