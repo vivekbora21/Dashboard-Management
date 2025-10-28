@@ -200,3 +200,86 @@ def get_total_revenue(request: Request, period: str = Query("all", enum=["day", 
         {"month": m, "revenue": float(r or 0)} for m, r in total_revenue
     ]
     return total_revenue_data
+
+@router.get("/revenue-profit-margin-trend")
+def get_revenue_profit_margin_trend(request: Request, period: str = Query("all", enum=["day", "week", "month", "year", "all"]), db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+
+    start_date, end_date = get_date_range(period)
+    query = db.query(
+        func.date_format(models.Product.soldDate, "%Y-%m").label("month"),
+        func.sum(models.Product.sellingPrice * models.Product.quantity).label("revenue"),
+        func.sum(
+            (models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity
+        ).label("profit")
+    ).filter(models.Product.userId == user.id)
+
+    if start_date and end_date:
+        query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
+
+    revenue_profit_data = query.group_by(func.date_format(models.Product.soldDate, "%Y-%m")).order_by("month").all()
+
+    revenue_profit_margin_data = []
+    for month, revenue, profit in revenue_profit_data:
+        margin = (profit / revenue * 100) if revenue > 0 else 0
+        revenue_profit_margin_data.append({
+            "month": month,
+            "revenue": float(revenue or 0),
+            "profit_margin": round(margin, 2)
+        })
+
+    return revenue_profit_margin_data
+
+@router.get("/sales-distribution-by-category")
+def get_sales_distribution_by_category(request: Request, period: str = Query("all", enum=["day", "week", "month", "year", "all"]), db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+
+    start_date, end_date = get_date_range(period)
+    query = db.query(
+        models.Product.productCategory,
+        func.sum(models.Product.sellingPrice * models.Product.quantity).label("sales")
+    ).filter(models.Product.userId == user.id)
+
+    if start_date and end_date:
+        query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
+
+    sales_distribution = query.group_by(models.Product.productCategory).all()
+    sales_distribution_data = [
+        {"category": c, "sales": float(s or 0)} for c, s in sales_distribution
+    ]
+    return sales_distribution_data
+
+@router.get("/avg-profit-margin-per-category")
+def get_avg_profit_margin_per_category(request: Request, period: str = Query("all", enum=["day", "week", "month", "year", "all"]), db: Session = Depends(get_db)):
+    try:
+        user = get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
+
+    start_date, end_date = get_date_range(period)
+    query = db.query(
+        models.Product.productCategory,
+        func.sum(models.Product.sellingPrice * models.Product.quantity).label("revenue"),
+        func.sum((models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity).label("profit")
+    ).filter(models.Product.userId == user.id)
+
+    if start_date and end_date:
+        query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
+
+    margin_data = query.group_by(models.Product.productCategory).all()
+
+    avg_profit_margin_data = []
+    for category, revenue, profit in margin_data:
+        margin = (profit / revenue * 100) if revenue > 0 else 0
+        avg_profit_margin_data.append({
+            "category": category,
+            "profit_margin": round(margin, 2)
+        })
+
+    return avg_profit_margin_data

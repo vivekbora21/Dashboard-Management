@@ -16,6 +16,8 @@ const chartImports = {
   topProducts: lazy(() => import("./components/TopProductsChart")),
   profitPerCategory: lazy(() => import("./components/ProfitPerCategoryChart")),
   avgRatings: lazy(() => import("./components/AvgRatingsChart")),
+  revenueProfitMarginTrend: lazy(() => import("./components/RevenueProfitMarginChart")),
+  avgProfitMarginPerCategory: lazy(() => import("./components/AvgProfitMarginChart")),
 };
 
 const TIME_PERIODS = { DAY: "day", WEEK: "week", MONTH: "month", YEAR: "year", ALL: "all" };
@@ -31,12 +33,14 @@ const Statistics = () => {
   const chartConfig = [
     { key: "salesTrend", title: "Monthly Sales & Profit Trend", plan: "free" },
     { key: "dailySales", title: "Daily Sales Count", plan: "free" },
+    { key: "topProducts", title: "Top 5 Selling Products", plan: "free" },
     { key: "categoryDistribution", title: "Category Distribution", plan: "basic" },
     { key: "categoryPerformance", title: "Category Performance Comparison", plan: "basic" },
     { key: "profitPerProduct", title: "Profit per Product", plan: "basic" },
-    { key: "topProducts", title: "Top 5 Selling Products", plan: "premium" },
-    { key: "profitPerCategory", title: "Profit per Category", plan: "premium" },
+    { key: "topProducts", title: "Top 5 Selling Products", plan: "free" },
     { key: "avgRatings", title: "Average Ratings per Category", plan: "premium" },
+    { key: "revenueProfitMarginTrend", title: "Revenue & Profit Margin Trend", plan: "premium" },
+    { key: "avgProfitMarginPerCategory", title: "Average Profit Margin per Category", plan: "premium" },
   ];
 
   const [timeFilters, setTimeFilters] = useState(() =>
@@ -57,6 +61,8 @@ const Statistics = () => {
           "profit-per-category",
           "avg-ratings",
           "category-distribution",
+          "revenue-profit-margin-trend",
+          "avg-profit-margin-per-category",
         ];
         const responses = await Promise.allSettled(
           endpoints.map((ep) => {
@@ -64,7 +70,7 @@ const Statistics = () => {
             return api.get(`/statistics/${ep}?period=${timeFilters[key] || "all"}`);
           })
         );
-        const [salesTrend, dailySales, profitPerProduct, topProducts, profitPerCategory, avgRatings, categoryDistribution] =
+        const [salesTrend, dailySales, profitPerProduct, topProducts, profitPerCategory, avgRatings, categoryDistribution, revenueProfitMarginTrend, avgProfitMarginPerCategory] =
           responses.map((r) => (r.status === "fulfilled" ? r.value.data : []));
 
         setStats({
@@ -75,6 +81,8 @@ const Statistics = () => {
           profit_per_category: profitPerCategory,
           avg_ratings: avgRatings,
           category_distribution: categoryDistribution,
+          revenue_profit_margin_trend: revenueProfitMarginTrend,
+          avg_profit_margin_per_category: avgProfitMarginPerCategory,
         });
       } catch (error) {
         console.error("Error fetching statistics:", error);
@@ -109,12 +117,14 @@ const Statistics = () => {
       profitPerCategory: mapData.default(stats.profit_per_category || []),
       avgRatings: mapData.default(stats.avg_ratings || []),
       categoryDistribution: mapData.default(stats.category_distribution || []),
+      revenueProfitMarginTrend: mapData.default(stats.revenue_profit_margin_trend || []),
+      avgProfitMarginPerCategory: mapData.default(stats.avg_profit_margin_per_category || []),
     };
   }, [stats]);
 
   const handleDownloadPDF = async () => {
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-      import("html2canvas"),
+       import("html2canvas"),
       import("jspdf"),
     ]);
 
