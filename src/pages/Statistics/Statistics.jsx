@@ -38,7 +38,7 @@ const Statistics = () => {
     { key: "categoryDistribution", title: "Category Distribution", plan: "basic" },
     { key: "categoryPerformance", title: "Category Performance Comparison", plan: "basic" },
     { key: "profitPerProduct", title: "Profit per Product", plan: "basic" },
-    { key: "topProducts", title: "Top 5 Selling Products", plan: "free" },
+    { key: "profitPerCategory", title: "Profit per Category", plan: "basic" },
     { key: "avgRatings", title: "Average Ratings per Category", plan: "premium" },
     { key: "revenueProfitMarginTrend", title: "Revenue & Profit Margin Trend", plan: "premium" },
     { key: "avgProfitMarginPerCategory", title: "Average Profit Margin per Category", plan: "premium" },
