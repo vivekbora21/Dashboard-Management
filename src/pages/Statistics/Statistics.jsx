@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import ChartWrapper from "./components/ChartWrapper";
 import Loading from "../../components/Loading";
+import { toast } from "react-toastify";
 
 const chartImports = {
   salesTrend: lazy(() => import("./components/SalesTrendChart")),
@@ -137,6 +138,11 @@ const Statistics = () => {
   }, [stats]);
 
   const handleDownloadPDF = async () => {
+    if (userPlan === 'free') {
+      toast.info("Upgrade to a higher plan to download statistics PDF");
+      return;
+    }
+
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
       import("html2canvas"),
       import("jspdf"),
