@@ -27,6 +27,7 @@ const Statistics = () => {
   const navigate = useNavigate();
   const statsRef = useRef();
   const [stats, setStats] = useState(null);
+  const [chartsReady, setChartsReady] = useState(false);
 
   const PLAN_LEVELS = { free: 1, basic: 2, premium: 3 };
 
@@ -64,14 +65,25 @@ const Statistics = () => {
           "revenue-profit-margin-trend",
           "avg-profit-margin-per-category",
         ];
+
         const responses = await Promise.allSettled(
           endpoints.map((ep) => {
             const key = ep.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
             return api.get(`/statistics/${ep}?period=${timeFilters[key] || "all"}`);
           })
         );
-        const [salesTrend, dailySales, profitPerProduct, topProducts, profitPerCategory, avgRatings, categoryDistribution, revenueProfitMarginTrend, avgProfitMarginPerCategory] =
-          responses.map((r) => (r.status === "fulfilled" ? r.value.data : []));
+
+        const [
+          salesTrend,
+          dailySales,
+          profitPerProduct,
+          topProducts,
+          profitPerCategory,
+          avgRatings,
+          categoryDistribution,
+          revenueProfitMarginTrend,
+          avgProfitMarginPerCategory,
+        ] = responses.map((r) => (r.status === "fulfilled" ? r.value.data : []));
 
         setStats({
           sales_trend: salesTrend,
@@ -84,6 +96,8 @@ const Statistics = () => {
           revenue_profit_margin_trend: revenueProfitMarginTrend,
           avg_profit_margin_per_category: avgProfitMarginPerCategory,
         });
+
+        setTimeout(() => setChartsReady(true), 1500);
       } catch (error) {
         console.error("Error fetching statistics:", error);
       }
@@ -124,35 +138,55 @@ const Statistics = () => {
 
   const handleDownloadPDF = async () => {
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-       import("html2canvas"),
+      import("html2canvas"),
       import("jspdf"),
     ]);
 
-    const userLevel = PLAN_LEVELS[userPlan] || PLAN_LEVELS.free;
-
-    const chartElements = Array.from(statsRef.current.querySelectorAll(".chart-wrapper"));
-    const hiddenCharts = [];
-
-    chartElements.forEach((chartEl, index) => {
-      const requiredPlan = chartConfig[index].plan;
-      const requiredLevel = PLAN_LEVELS[requiredPlan];
-      if (requiredLevel > userLevel) {
-        chartEl.style.display = "none";
-        hiddenCharts.push(chartEl);
-      }
-    });
-
-    const canvas = await html2canvas(statsRef.current, { scale: 2, backgroundColor: "#fff" });
-    const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight * 0.95);
-    pdf.save("statistics.pdf");
+    const userLevel = PLAN_LEVELS[userPlan] || PLAN_LEVELS.free;
+    const chartElements = Array.from(statsRef.current.querySelectorAll(".chart-wrapper"));
 
-    hiddenCharts.forEach((chartEl) => {
-      chartEl.style.display = "";
-    });
+    const chartsPerPage = 4;
+    const marginX = 10;
+    const marginY = 10;
+    const spacingX = 5;
+    const spacingY = 8;
+    const chartWidth = (pdf.internal.pageSize.getWidth() - marginX * 2 - spacingX) / 2;
+    const chartHeight = (pdf.internal.pageSize.getHeight() - marginY * 2 - spacingY) / 2;
+
+    let chartIndex = 0;
+    for (let i = 0; i < chartElements.length; i++) {
+      const chartEl = chartElements[i];
+      const requiredPlan = chartConfig[i]?.plan || "free";
+      const requiredLevel = PLAN_LEVELS[requiredPlan];
+      if (requiredLevel > userLevel) continue;
+
+      await new Promise((r) => setTimeout(r, 300));
+
+      const canvas = await html2canvas(chartEl, {
+        scale: 2,
+        backgroundColor: "#fff",
+        useCORS: true,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const row = Math.floor((chartIndex % chartsPerPage) / 2);
+      const col = chartIndex % 2;
+
+      const posX = marginX + col * (chartWidth + spacingX);
+      const posY = marginY + row * (chartHeight + spacingY);
+
+      pdf.addImage(imgData, "PNG", posX, posY, chartWidth, chartHeight);
+
+      chartIndex++;
+
+      if (chartIndex % chartsPerPage === 0 && i < chartElements.length - 1) {
+        pdf.addPage();
+      }
+    }
+
+    pdf.save("statistics.pdf");
   };
 
 
@@ -183,8 +217,12 @@ const Statistics = () => {
         <p>All your important statistics at a glance</p>
       </div>
 
-      <button className="download-btn" onClick={handleDownloadPDF}>
-        <FaDownload /> Download PDF
+      <button
+        className="download-btn"
+        onClick={handleDownloadPDF}
+        disabled={!chartsReady}
+      >
+        <FaDownload /> {chartsReady ? "Download PDF" : "Preparing Charts..."}
       </button>
 
       <div className="chart-grid" ref={statsRef}>
