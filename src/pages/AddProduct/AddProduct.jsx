@@ -37,7 +37,7 @@ const AddProduct = () => {
         const res = await getUserPlan();
         const plan = res.plan;
         setUserPlan(plan);
-        const limits = { Free: 5, Basic: 15, Premium: 50 };
+        const limits = { Free: 5, Basic: 20, Premium: 50 };
         setUploadLimit(limits[plan] || 5);
       } catch (err) {
         console.error("Failed to fetch user plan:", err);

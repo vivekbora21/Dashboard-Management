@@ -140,7 +140,7 @@ body {
   min-height: 350px; 
 }
 
-.lock-overlay {
+.plan-lock-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -155,12 +155,12 @@ body {
   z-index: 10;
 }
 
-.lock-icon {
+.plan-lock-icon {
   font-size: 3rem;
   margin-bottom: 10px;
 }
 
-.lock-overlay p {
+.plan-lock-overlay p {
   color: white;
   font-size: 1.2rem;
   margin-bottom: 15px;
