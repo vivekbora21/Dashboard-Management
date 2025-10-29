@@ -220,38 +220,38 @@ const Products = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Update Product</h2>
             <form onSubmit={handleFormSubmit} className="product-form">
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Product Name *</label>
                 <input type="text" name="productName" value={formData.productName} onChange={handleFormChange} required />
               </div>
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Product Category *</label>
                 <select name="productCategory" value={formData.productCategory} onChange={handleFormChange} required >
                   <option value="">Select a category</option>
                   {categories.map((cat) => (<option key={cat} value={cat}>{cat}</option>))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Product Price (₹) *</label>
                 <input type="number" name="productPrice" value={formData.productPrice} onChange={handleFormChange} required />
               </div>
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Selling Price (₹) *</label>
                 <input type="number" name="sellingPrice" value={formData.sellingPrice} onChange={handleFormChange} required />
               </div>
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Quantity *</label>
                 <input type="number" name="quantity" value={formData.quantity} onChange={handleFormChange} required />
               </div>
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Ratings</label>
                 <input type="number" name="ratings" value={formData.ratings} onChange={handleFormChange} />
               </div>
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Discounts</label>
                 <input type="text" name="discounts" value={formData.discounts} onChange={handleFormChange} />
               </div>
-              <div className="form-group">
+              <div className="modal-form-group">
                 <label>Sold Date</label>
                 <input type="date" name="soldDate" value={formData.soldDate} onChange={handleFormChange} />
               </div>

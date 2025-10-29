@@ -190,19 +190,19 @@
   flex-direction: column;
 }
 
-.form-group {
+.modal-form-group {
   margin-bottom: 15px;
 }
 
-.form-group label {
-  display: block;
+.modal-form-group label {
+  display: flex;
   margin-bottom: 5px;
   font-weight: bold;
   color: #555;
 }
 
-.form-group input,
-.form-group select {
+.modal-form-group input,
+.modal-form-group select {
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
@@ -210,8 +210,8 @@
   font-size: 14px;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.modal-form-group input:focus,
+.modal-form-group select:focus {
   outline: none;
   border-color: #007bff;
 }
