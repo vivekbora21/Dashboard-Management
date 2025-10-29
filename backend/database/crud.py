@@ -216,17 +216,30 @@ def update_user_plan(db: Session, user_id: int, plan_id: int):
     if not db_plan:
         return None
     end_date = datetime.now() + timedelta(days=30)
-    upt_subscription = update_subscription(db, user_id, plan_id, end_date)
+    update_subscription(db, user_id, plan_id, end_date)
     subscription = create_subscription(db, user_id, plan_id, end_date)
     return subscription
 
+def check_and_update_expired_subscriptions(db: Session, user_id: int):
+    expired_subscriptions = db.query(models.Subscription).filter(
+        models.Subscription.user_id == user_id,
+        models.Subscription.status == 1,
+        models.Subscription.end_date < datetime.now()
+    ).all()
+
+    for sub in expired_subscriptions:
+        sub.status = 0
+        db.commit()
+        create_subscription(db, user_id, 1)
+
 def get_user_current_plan(db: Session, user_id: int):
+    check_and_update_expired_subscriptions(db, user_id)
     db_subscription = db.query(models.Subscription).filter(
         models.Subscription.user_id == user_id,
         models.Subscription.status == 1
     ).order_by(models.Subscription.start_date.desc()).first()
 
-    if not db_subscription or (db_subscription.end_date and db_subscription.end_date < datetime.now()):
+    if not db_subscription:
         return None
 
     plan = db.query(models.Plan).filter(models.Plan.id == db_subscription.plan_id).first()
@@ -255,7 +268,7 @@ def create_subscription(db: Session, user_id: int, plan_id: int, end_date: datet
     db.refresh(db_subscription)
     return db_subscription
 
-def update_subscription(db: Session, user_id: int, plan_id: int, end_date: datetime):
+def update_subscription(db: Session, user_id: int):
     db_subscription = db.query(models.Subscription).filter(
         models.Subscription.user_id == user_id,
         models.Subscription.status == 1
