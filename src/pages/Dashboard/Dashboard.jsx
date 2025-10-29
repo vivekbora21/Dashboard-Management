@@ -188,12 +188,12 @@ const Dashboard = () => {
                 <tr key={p.id}>
                   <td>{p.productName.charAt(0).toUpperCase() + p.productName.slice(1)}</td>
                   <td>{p.productCategory}</td>
-                  <td>{p.productPrice.toLocaleString('en-IN')} ₹</td>
+                  <td>₹ {p.productPrice.toLocaleString('en-IN')}</td>
                   <td>{p.quantity}</td>
-                  <td>{p.sellingPrice.toLocaleString('en-IN')} ₹</td>
+                  <td>₹ {p.sellingPrice.toLocaleString('en-IN')}</td>
                   <td>{p.ratings}</td>
                   <td>{p.soldDate}</td>
-                  <td>{p.profit.toLocaleString('en-IN')} ₹</td>
+                  <td>₹ {p.profit.toLocaleString('en-IN')}</td>
                 </tr>
               ))
             )}

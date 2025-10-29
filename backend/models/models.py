@@ -38,7 +38,7 @@ class Product(Base):
     ratings = Column(Float, nullable=True)
     discounts = Column(String(50), nullable=True)
     soldDate = Column(Date, nullable=True)
-    is_deleted = Column(Integer, default=0)  # 0 for not deleted, 1 for deleted
+    is_deleted = Column(Integer, default=0) 
 
     user = relationship("User", back_populates="products")
 

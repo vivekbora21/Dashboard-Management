@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { toast } from 'react-toastify';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -13,6 +13,12 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const resetToken = location.state?.reset_token || '';
+
+  useEffect(() => {
+    if (!resetToken) {
+      navigate('/forgot-password');
+    }
+  }, [resetToken, navigate]);
 
   const validatePassword = (password) => {
     if (!password) return 'New password is required';

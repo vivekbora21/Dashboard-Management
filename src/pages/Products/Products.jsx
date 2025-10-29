@@ -174,11 +174,11 @@ const Products = () => {
                 <td>{slNo}</td>
                 <td>{product.productName.charAt(0).toUpperCase() + product.productName.slice(1)}</td>
                 <td>{product.productCategory}</td>
-                <td>{product.productPrice.toLocaleString('en-IN')} ₹</td>
-                <td>{product.sellingPrice.toLocaleString('en-IN')} ₹</td>
+                <td>₹ {product.productPrice.toLocaleString('en-IN')}</td>
+                <td>₹ {product.sellingPrice.toLocaleString('en-IN')}</td>
                 <td>{product.quantity}</td>
                 <td>{product.ratings}</td>
-                <td>{product.discounts.toLocaleString('en-IN')} ₹</td>
+                <td>₹ {product.discounts.toLocaleString('en-IN')}</td>
                 <td>{product.soldDate}</td>
                 <td>
                   <button className="update-btn" onClick={() => handleUpdate(product)}><HiOutlinePencilAlt/></button>
