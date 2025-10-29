@@ -236,15 +236,6 @@ def check_and_update_expired_subscriptions(db: Session, user_id: int):
         try:
             user = db.query(models.User).filter(models.User.id == user_id).first()
             plan = db.query(models.Plan).filter(models.Plan.id == sub.plan_id).first()
-            template_path = os.path.join(os.path.dirname(__file__), '..', 'templates', 'plan_expiry.html')
-            with open(template_path, "r") as f:
-                html_template = f.read()
-            html_content = html_template.format(
-                firstName=user.firstName,
-                lastName=user.lastName,
-                planName=plan.name if plan else "Your Plan",
-                expiryDate=sub.end_date.strftime("%Y-%m-%d") if sub.end_date else "N/A"
-            )
             html_content = render_template('plan_expiry.html',
                                         firstName=user.firstName,
                                         lastName=user.lastName,
