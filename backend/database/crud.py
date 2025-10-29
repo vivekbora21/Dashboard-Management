@@ -61,7 +61,7 @@ def create_product(db: Session, product: schemas.ProductCreate):
         raise Exception("Error creating product!")
 
 def get_products(db: Session, user_id: int):
-    return db.query(models.Product).filter(models.Product.userId == user_id).all()
+    return db.query(models.Product).filter(models.Product.userId == user_id, models.Product.is_deleted == 0).all()
 
 def update_product(db: Session, product_id: int, product: schemas.ProductCreate, user_id: int):
     db_product = db.query(models.Product).filter(models.Product.id == product_id, models.Product.userId == user_id).first()
@@ -79,15 +79,16 @@ def delete_product(db: Session, product_id: int, user_id: int):
     db_product = db.query(models.Product).filter(models.Product.id == product_id, models.Product.userId == user_id).first()
     if not db_product:
         return None
-    db.delete(db_product)
+    db_product.is_deleted = 1
     db.commit()
+    db.refresh(db_product)
     return True
 
 def get_products_by_date(db: Session, date: str, user_id: int):
     from datetime import datetime
     try:
         query_date = datetime.strptime(date, '%Y-%m-%d').date()
-        return db.query(models.Product).filter(models.Product.soldDate == query_date, models.Product.userId == user_id).all()
+        return db.query(models.Product).filter(models.Product.soldDate == query_date, models.Product.userId == user_id, models.Product.is_deleted == 0).all()
     except ValueError:
         return []
 
@@ -111,7 +112,8 @@ def get_summary(db: Session, period: str, user_id: int):
             ).filter(
                 models.Product.soldDate >= start_date,
                 models.Product.soldDate < end_date,
-                models.Product.userId == user_id
+                models.Product.userId == user_id,
+                models.Product.is_deleted == 0
             ).group_by(models.Product.soldDate).all()
 
             data_dict = {str(r.soldDate): {'sales': float(r.sales), 'profit': float(r.profit)} for r in results}
@@ -144,13 +146,14 @@ def get_summary(db: Session, period: str, user_id: int):
     ).filter(
         models.Product.soldDate >= start_date,
         models.Product.soldDate <= today,
-        models.Product.userId == user_id
+        models.Product.userId == user_id,
+        models.Product.is_deleted == 0
     ).group_by(models.Product.soldDate).all()
 
     return [{'date': str(r.soldDate), 'sales': float(r.sales), 'profit': float(r.profit)} for r in results]
 
 def get_stats(db: Session, user_id: int):
-    products = db.query(models.Product).filter(models.Product.userId == user_id).all()
+    products = db.query(models.Product).filter(models.Product.userId == user_id, models.Product.is_deleted == 0).all()
     if not products:
         return {
             "totalSales": 0,
@@ -203,8 +206,8 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
 
 def get_products_paginated(db: Session, user_id: int, page: int = 1, limit: int = 10):
     offset = (page - 1) * limit
-    products = db.query(models.Product).filter(models.Product.userId == user_id).order_by(models.Product.soldDate.desc()).offset(offset).limit(limit).all()
-    total = db.query(models.Product).filter(models.Product.userId == user_id).count()
+    products = db.query(models.Product).filter(models.Product.userId == user_id, models.Product.is_deleted == 0).order_by(models.Product.soldDate.desc()).offset(offset).limit(limit).all()
+    total = db.query(models.Product).filter(models.Product.userId == user_id, models.Product.is_deleted == 0).count()
     return products, total
 
 def get_all_plans(db: Session):

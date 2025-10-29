@@ -10,17 +10,17 @@ router = APIRouter(prefix="", tags=["kpi"])
 
 def get_total_sales(db: Session, user_id: int):
     result = db.query(func.sum(models.Product.sellingPrice * models.Product.quantity))\
-        .filter(models.Product.userId == user_id).scalar()
+        .filter(models.Product.userId == user_id, models.Product.is_deleted == 0).scalar()
     return float(result or 0)
 
 def get_total_profit(db: Session, user_id: int):
     result = db.query(func.sum((models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity))\
-        .filter(models.Product.userId == user_id).scalar()
+        .filter(models.Product.userId == user_id, models.Product.is_deleted == 0).scalar()
     return float(result or 0)
 
 def get_avg_rating(db: Session, user_id: int):
     result = db.query(func.avg(models.Product.ratings))\
-        .filter(models.Product.userId == user_id, models.Product.ratings != None).scalar()
+        .filter(models.Product.userId == user_id, models.Product.ratings != None, models.Product.is_deleted == 0).scalar()
     return float(result or 0)
 
 def get_total_orders(db: Session, user_id: int):
@@ -30,12 +30,12 @@ def get_total_orders(db: Session, user_id: int):
 
 def get_total_quantity(db: Session, user_id: int):
     result = db.query(func.sum(models.Product.quantity))\
-        .filter(models.Product.userId == user_id).scalar()
+        .filter(models.Product.userId == user_id, models.Product.is_deleted == 0).scalar()
     return int(result or 0)
 
 def get_highest_selling_product(db: Session, user_id: int):
     product = db.query(models.Product)\
-        .filter(models.Product.userId == user_id)\
+        .filter(models.Product.userId == user_id, models.Product.is_deleted == 0)\
         .order_by((models.Product.sellingPrice * models.Product.quantity).desc())\
         .first()
     if product:
@@ -44,7 +44,7 @@ def get_highest_selling_product(db: Session, user_id: int):
 
 def get_highest_profit_product(db: Session, user_id: int):
     product = db.query(models.Product)\
-        .filter(models.Product.userId == user_id)\
+        .filter(models.Product.userId == user_id, models.Product.is_deleted == 0)\
         .order_by(((models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity).desc())\
         .first()
     if product:
@@ -53,7 +53,7 @@ def get_highest_profit_product(db: Session, user_id: int):
 
 def get_avg_discount(db: Session, user_id: int):
     discounts = db.query(models.Product.discounts)\
-        .filter(models.Product.userId == user_id, models.Product.discounts != None).all()
+        .filter(models.Product.userId == user_id, models.Product.discounts != None, models.Product.is_deleted == 0).all()
     discount_values = []
     for d in discounts:
         try:
@@ -67,7 +67,7 @@ def get_avg_discount(db: Session, user_id: int):
 
 def get_top_profit_products(db: Session, user_id: int, limit: int = 5):
     products = db.query(models.Product)\
-        .filter(models.Product.userId == user_id)\
+        .filter(models.Product.userId == user_id, models.Product.is_deleted == 0)\
         .order_by(((models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity).desc())\
         .limit(limit).all()
 
@@ -99,7 +99,7 @@ def get_top_category(db: Session, user_id: int):
     result = db.query(
         models.Product.productCategory,
         func.sum(models.Product.sellingPrice * models.Product.quantity).label("total_sales")
-    ).filter(models.Product.userId == user_id)\
+    ).filter(models.Product.userId == user_id, models.Product.is_deleted == 0)\
      .group_by(models.Product.productCategory)\
      .order_by(func.sum(models.Product.sellingPrice * models.Product.quantity).desc())\
      .first()
@@ -113,10 +113,10 @@ def get_revenue_growth(db: Session, user_id: int):
     start_of_last_month = (start_of_this_month - timedelta(days=1)).replace(day=1)
 
     this_month_sales = db.query(func.sum(models.Product.sellingPrice * models.Product.quantity))\
-        .filter(models.Product.userId == user_id, models.Product.soldDate >= start_of_this_month).scalar() or 0
+        .filter(models.Product.userId == user_id, models.Product.soldDate >= start_of_this_month, models.Product.is_deleted == 0).scalar() or 0
 
     last_month_sales = db.query(func.sum(models.Product.sellingPrice * models.Product.quantity))\
-        .filter(models.Product.userId == user_id, models.Product.soldDate >= start_of_last_month, models.Product.soldDate < start_of_this_month).scalar() or 0
+        .filter(models.Product.userId == user_id, models.Product.soldDate >= start_of_last_month, models.Product.soldDate < start_of_this_month, models.Product.is_deleted == 0).scalar() or 0
 
     if last_month_sales == 0:
         return 0.0

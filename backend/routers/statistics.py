@@ -36,7 +36,7 @@ def get_sales_trend(request: Request, period: str = Query("all", enum=["day", "w
         func.sum(
             (models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity
         ).label("profit")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -59,7 +59,7 @@ def get_category_distribution(request: Request, period: str = Query("all", enum=
     query = db.query(
         models.Product.productCategory,
         func.sum(models.Product.sellingPrice * models.Product.quantity).label("total")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -81,7 +81,7 @@ def get_avg_ratings(request: Request, period: str = Query("all", enum=["day", "w
     query = db.query(
         models.Product.productCategory,
         func.avg(models.Product.ratings).label("avg_rating")
-    ).filter(models.Product.userId == user.id, models.Product.ratings != None)
+    ).filter(models.Product.userId == user.id, models.Product.ratings != None, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -105,7 +105,7 @@ def get_profit_per_category(request: Request, period: str = Query("all", enum=["
         func.sum(
             (models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity
         ).label("profit")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -125,7 +125,7 @@ def get_top_products(request: Request, db: Session = Depends(get_db)):
 
     top_products = (
         db.query(models.Product.productName, func.sum(models.Product.quantity).label("total_sold"))
-        .filter(models.Product.userId == user.id)
+        .filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
         .group_by(models.Product.productName)
         .order_by(func.sum(models.Product.quantity).desc())
         .limit(5)
@@ -144,7 +144,7 @@ def get_daily_sales(request: Request, period: str = Query("all", enum=["day", "w
         raise HTTPException(status_code=401, detail="Invalid or missing authentication token")
 
     start_date, end_date = get_date_range(period)
-    query = db.query(models.Product.soldDate, func.sum(models.Product.quantity).label("total")).filter(models.Product.userId == user.id)
+    query = db.query(models.Product.soldDate, func.sum(models.Product.quantity).label("total")).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -166,7 +166,7 @@ def get_profit_per_product(request: Request, period: str = Query("all", enum=["d
     query = db.query(
         models.Product.productName,
         func.sum((models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity).label("profit")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -189,7 +189,7 @@ def get_total_revenue(request: Request, period: str = Query("all", enum=["day", 
     query = db.query(
         func.date_format(models.Product.soldDate, "%Y-%m").label("month"),
         func.sum(models.Product.sellingPrice * models.Product.quantity).label("revenue")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -215,7 +215,7 @@ def get_revenue_profit_margin_trend(request: Request, period: str = Query("all",
         func.sum(
             (models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity
         ).label("profit")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -244,7 +244,7 @@ def get_sales_distribution_by_category(request: Request, period: str = Query("al
     query = db.query(
         models.Product.productCategory,
         func.sum(models.Product.sellingPrice * models.Product.quantity).label("sales")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
@@ -267,7 +267,7 @@ def get_avg_profit_margin_per_category(request: Request, period: str = Query("al
         models.Product.productCategory,
         func.sum(models.Product.sellingPrice * models.Product.quantity).label("revenue"),
         func.sum((models.Product.sellingPrice - models.Product.productPrice) * models.Product.quantity).label("profit")
-    ).filter(models.Product.userId == user.id)
+    ).filter(models.Product.userId == user.id, models.Product.is_deleted == 0)
 
     if start_date and end_date:
         query = query.filter(and_(models.Product.soldDate >= start_date, models.Product.soldDate <= end_date))
