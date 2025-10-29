@@ -6,6 +6,8 @@ from passlib.context import CryptContext
 from utilities.utils import parse_date
 from datetime import datetime, timedelta
 from sqlalchemy import func
+import os
+from utilities.email_utils import send_html_email, render_template
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -216,7 +218,7 @@ def update_user_plan(db: Session, user_id: int, plan_id: int):
     if not db_plan:
         return None
     end_date = datetime.now() + timedelta(days=30)
-    update_subscription(db, user_id, plan_id, end_date)
+    update_subscription(db, user_id)
     subscription = create_subscription(db, user_id, plan_id, end_date)
     return subscription
 
@@ -230,6 +232,29 @@ def check_and_update_expired_subscriptions(db: Session, user_id: int):
     for sub in expired_subscriptions:
         sub.status = 0
         db.commit()
+
+        try:
+            user = db.query(models.User).filter(models.User.id == user_id).first()
+            plan = db.query(models.Plan).filter(models.Plan.id == sub.plan_id).first()
+            template_path = os.path.join(os.path.dirname(__file__), '..', 'templates', 'plan_expiry.html')
+            with open(template_path, "r") as f:
+                html_template = f.read()
+            html_content = html_template.format(
+                firstName=user.firstName,
+                lastName=user.lastName,
+                planName=plan.name if plan else "Your Plan",
+                expiryDate=sub.end_date.strftime("%Y-%m-%d") if sub.end_date else "N/A"
+            )
+            html_content = render_template('plan_expiry.html',
+                                        firstName=user.firstName,
+                                        lastName=user.lastName,
+                                        planName=plan.name if plan else "Your Plan",
+                                        expiryDate=sub.end_date.strftime("%Y-%m-%d") if sub.end_date else "N/A"
+            )
+            send_html_email(to_email=user.email, subject="Your Plan Has Expired", html_content=html_content)
+        except Exception as e:
+            print(f"Failed to send plan expiry email: {e}")
+
         create_subscription(db, user_id, 1)
 
 def get_user_current_plan(db: Session, user_id: int):

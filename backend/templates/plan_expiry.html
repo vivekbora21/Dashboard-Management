@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Expiry Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            background-color: #dc3545;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666666;
+            font-size: 12px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #ffc107;
+            color: #212529;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Plan Expiry Notification</h1>
+        </div>
+        <div class="content">
+            <p>Dear {{firstName}} {{lastName}},</p>
+            <div class="warning">
+                <p><strong>Important:</strong> Your current plan has expired.</p>
+            </div>
+            <p>Your subscription to the <strong>{{planName}}</strong> plan has ended on {{expiryDate}}.</p>
+            <p>To continue enjoying our services, please renew your subscription or upgrade to a new plan.</p>
+            <a href="#" class="button">Renew Subscription</a>
+        </div>
+        <div class="footer">
+            <p>If you have any questions, please contact our support team.</p>
+            <p>&copy; 2025 Sales Management. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

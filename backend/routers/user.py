@@ -6,6 +6,8 @@ from database.database import get_db
 import models.models as models
 import schemas.validation as validation
 import database.crud as crud
+from utilities.email_utils import send_html_email, render_template
+import os
 
 router = APIRouter(prefix="", tags=["users"])
 
@@ -28,6 +30,16 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     crud.create_subscription(db, new_user.id, 1)
+
+    # Send welcome email
+    try:
+        html_content = render_template('signup_welcome.html',
+                                       firstName=new_user.firstName,
+                                       lastName=new_user.lastName,
+                                       email=new_user.email)
+        send_html_email(new_user.email, "Welcome to Sales Management!", html_content)
+    except Exception as e:
+        print(f"Failed to send welcome email: {e}")
 
 @router.post("/login/")
 def login(user: schemas.UserLogin, response: Response, db: Session = Depends(get_db)):
