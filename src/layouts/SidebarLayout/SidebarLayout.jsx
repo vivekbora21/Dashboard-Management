@@ -37,7 +37,7 @@ const SidebarLayout = () => {
 
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/dashboard/addproduct", label: "Add Product", icon: Plus },
+    { path: "/dashboard/addproduct", label: "Add Data", icon: Plus },
     { path: "/dashboard/statistics", label: "Statistic", icon: BarChart3 },
     { path: "/dashboard/products", label: "Product", icon: Package },
     { path: "/dashboard/profile", label: "Profile", icon: User },

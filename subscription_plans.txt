@@ -1,0 +1,19 @@
+Subscription Plans and Features
+===============================
+
+This document outlines the available subscription plans for the dashboard management system.
+
+1. Free Plan
+   - Price: $0.00
+   - Description: Free plan with basic features
+   - Features: Access to basic dashboard, limited products (max 5 products per Excel upload), total of 50 products to be added in total till plan expiry
+
+2. Basic Plan
+   - Price: $9.99
+   - Description: Basic plan with more features
+   - Features: Access to dashboard, unlimited products, basic analytics (max 15 products per Excel upload), total of 200 products to be added in total till plan expiry
+
+3. Premium Plan
+   - Price: $19.99
+   - Description: Premium plan with all features
+   - Features: All features, advanced analytics, priority support (max 50 products per Excel upload), total of 500 products to be added in total till plan expiry

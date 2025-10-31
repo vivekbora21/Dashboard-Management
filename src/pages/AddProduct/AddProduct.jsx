@@ -191,8 +191,8 @@ const AddProduct = () => {
   return (
     <div className="add-product-page">
       <div className="page-heading-container">
-        <h1> Products Management <MdDriveFolderUpload/></h1>
-        <p>Upload your product Excel or add products manually</p>
+        <h1> Data Management <MdDriveFolderUpload/></h1>
+        <p>Upload your Excel data or add data manually</p>
       </div>
 
       <div className="selection-cards">
@@ -203,7 +203,7 @@ const AddProduct = () => {
             setShowManualForm(false);
           }}
         >
-          📁 Upload Products
+          📁 Upload Excel Data
           <p>Add upto {uploadLimit} data at once</p>
         </div>
         <div
@@ -213,7 +213,7 @@ const AddProduct = () => {
             setShowUploadControls(false);
           }}
         >
-          ✏️ Add Manually
+          ✏️ Add Data Manually
           <p>Add one product at a time</p>
         </div>
       </div>
